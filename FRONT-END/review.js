@@ -81,8 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
     '데이터 분석 기초': '1학기 · 필수',
     '인공지능 개론': '1학기 · 필수',
     '객체지향 프로그램': '1학기 · 필수',
-    미적분학: '1학기 · 필수',
-    '프로그래밍 기초': '1학기 · 필수',
+    미적분학: '1학기 · 선택',
+    '프로그래밍 기초': '1학기 · 필수1',
     '통계 기초': '1학기 · 필수',
     '인공지능 수학': '1학기 · 필수',
     'SW/HW 플랫폼 설계': '2학기 · 필수',
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     '의료 전문가 시스템': '2학기 · 선택',
     '의사결정 지원 시스템': '1학기 · 선택',
     'BM 프로젝트': '2학기 · 선택',
-    졸업논문: '2학기 · 선택',
+    졸업논문: '1학기 · 필수',
   };
 
   let currentGrade = '1학년';
@@ -1002,13 +1002,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  Object.keys(localStorage).forEach((key) => {
-    if (
-      key.startsWith('lecture-') ||
-      key.startsWith('exam-') ||
-      key === 'lectureReviews'
-    ) {
-      localStorage.removeItem(key);
-    }
-  });
+  // Object.keys(localStorage).forEach((key) => {
+  //   if (
+  //     key.startsWith('lecture-') ||
+  //     key.startsWith('exam-') ||
+  //     key === 'lectureReviews'
+  //   ) {
+  //     localStorage.removeItem(key);
+  //   }
+  // }); // 작성된 글 초기화
 });
