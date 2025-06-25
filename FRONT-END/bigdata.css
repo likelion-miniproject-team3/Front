@@ -313,3 +313,10 @@ body {
 .elective-card .subject-header {
   background: linear-gradient(to top, #e9f0fe 0%, #bcd4fa 50%, #6c92f0 100%);
 }
+.subject-card.match {
+  box-shadow: 5px 5px 7px #898a8d;
+  border-radius: 28px;
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
