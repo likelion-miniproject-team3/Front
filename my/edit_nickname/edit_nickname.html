@@ -3,44 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>마이페이지</title>
-    <link rel="stylesheet" href="my.css" />
+    <title>닉네임 변경</title>
+    <link rel="stylesheet" href="edit_nickname.css" />
   </head>
   <body>
-    <div class="mypage-header">
-      <h2>마이페이지</h2>
-    </div>
-    <div class="mypage">
-      <!-- 프로필 영역 -->
-      <div class="section profile">
-        <div class="profile-img">사진</div>
-        <div class="profile-name" id="userNameDisplay">사용자 이름</div>
-        <a href="/my/edit_profile/edit_profile.html" class="edit-info"
-          >내 정보 수정</a
+    <div class="nickname-edit-container">
+      <!-- 상단 바 -->
+      <div class="top-bar">
+        <button
+          class="back-btn"
+          onclick="window.location.href='/my/edit_profile/edit_profile.html'"
         >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="#000"
+          >
+            <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+          </svg>
+        </button>
+        <div class="top-title">닉네임 변경</div>
       </div>
 
-      <!-- 구분선 -->
-      <div class="divider"></div>
+      <!-- 안내 문구 -->
+      <p class="instruction">새로운 닉네임을 입력해주세요.</p>
 
-      <!-- 전공 이수학점 영역 -->
-      <div class="section progress-section">
-        <div class="progress-text">
-          전공 학점, 70% 달성<br />조금만 더 힘내요!
-        </div>
-        <div class="progress-circle">
-          <div class="percent">70%</div>
-        </div>
-        <div class="progress-detail">
-          취득학점 (46/70)<br />미달학점 (24/70)
-        </div>
+      <!-- 입력 필드 -->
+      <div class="input-wrapper">
+        <input
+          type="text"
+          id="nicknameInput"
+          placeholder="갈갈무슨갈따뜻한표범"
+        />
       </div>
 
-      <!-- 구분선 -->
-      <div class="divider"></div>
+      <!-- 변경 버튼 -->
+      <button class="submit-btn" id="submitNicknameBtn">변경하기</button>
     </div>
 
-    <!-- 하단 네비게이션 -->
     <footer class="bottom-nav">
       <a href="home.html" class="nav-item">
         <!-- 집 아이콘 -->
@@ -91,7 +93,6 @@
       </a>
     </footer>
 
-    <!-- JS 연결 -->
-    <script src="my.js"></script>
+    <script src="edit_nickname.js"></script>
   </body>
 </html>

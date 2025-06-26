@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
       item.classList.add('active');
     }
 
-    // 홈 버튼 클릭 시 희망 분야에 따라 이동
     if (href === 'home.html') {
       item.addEventListener('click', (e) => {
         e.preventDefault();
@@ -47,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function () {
             targetPage = '/home/micro/micro.html';
             break;
         }
-
         window.location.href = targetPage;
       });
     }
