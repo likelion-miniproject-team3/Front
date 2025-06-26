@@ -1,12 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="stylesheet" href="my.css" />
+    <title>마이페이지</title>
+    <link rel="stylesheet" href="/my/my.css" />
   </head>
   <body>
+    <div class="mypage-header">
+      <h2>마이페이지</h2>
+    </div>
+    <div class="mypage">
+      <!-- 프로필 영역 -->
+      <div class="section profile">
+        <div class="profile-img">사진</div>
+        <div class="profile-name" id="userNameDisplay">사용자 이름</div>
+        <a href="/my/edit_profile/edit_profile.html" class="edit-info"
+          >내 정보 수정</a
+        >
+      </div>
+
+      <!-- 구분선 -->
+      <div class="divider"></div>
+
+      <!-- 전공 이수학점 영역 -->
+      <div class="section progress-section">
+        <div class="progress-text">
+          전공 학점, 70% 달성<br />조금만 더 힘내요!
+        </div>
+        <div class="progress-circle">
+          <div class="percent">70%</div>
+        </div>
+        <div class="progress-detail">
+          취득학점 (46/70)<br />미달학점 (24/70)
+        </div>
+      </div>
+
+      <!-- 구분선 -->
+      <div class="divider"></div>
+    </div>
+
     <!-- 하단 네비게이션 -->
     <footer class="bottom-nav">
       <a href="home.html" class="nav-item">
@@ -25,7 +58,7 @@
         <span>홈</span>
       </a>
 
-      <a href="review.html" class="nav-item">
+      <a href="/review/review.html" class="nav-item">
         <!-- 문서 아이콘 -->
         <svg
           width="24"
@@ -41,12 +74,12 @@
         <span>후기</span>
       </a>
 
-      <a href="my.html" class="nav-item active">
+      <a href="/my/my.html" class="nav-item active">
         <!-- 사람 아이콘 -->
         <svg
           width="24"
           height="24"
-          fill="#3b6ef7"
+          fill="#aaa"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
         >
@@ -57,5 +90,8 @@
         <span>마이</span>
       </a>
     </footer>
+
+    <!-- JS 연결 -->
+    <script src="/my/my.js"></script>
   </body>
 </html>

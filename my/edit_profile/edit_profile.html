@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>내 정보 수정</title>
+    <link rel="stylesheet" href="/my/edit_profile/edit_profile.css" />
+  </head>
+  <body>
+    <div class="edit-container">
+      <h2 class="title">내 정보 수정</h2>
+
+      <!-- 프로필 이미지 영역 -->
+      <div class="profile-area">
+        <div class="profile-img-wrapper">
+          <div class="profile-img"></div>
+          <button class="camera-btn">
+            <img src="camera.png" alt="카메라 아이콘" />
+          </button>
+
+          <!-- 팝업 메뉴 -->
+          <ul class="upload-options hidden" id="uploadOptions">
+            <li>
+              <span>사진 보관함</span>
+              <img
+                src="/my/edit_profile/gallery.png"
+                alt="사진 보관함 아이콘"
+                class="icon-gallery"
+              />
+            </li>
+            <li>
+              <span>파일 선택</span>
+              <img
+                src="/my/edit_profile/file.png"
+                alt="파일 선택 아이콘"
+                class="icon-file"
+              />
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- ← profile-area 닫힘 -->
+
+      <div class="input-group">
+        <label for="nickname">닉네임</label>
+        <input type="text" id="nickname" />
+      </div>
+
+      <div class="input-group">
+        <label for="studentNumber">학번</label>
+        <input type="text" id="studentNumber" disabled />
+      </div>
+
+      <div class="input-group">
+        <label for="email">이메일</label>
+        <input type="email" id="email" disabled />
+      </div>
+    </div>
+    <!-- ← edit-container 닫힘 -->
+
+    <script src="/my/edit_profile/edit_profile.js"></script>
+  </body>
+</html>

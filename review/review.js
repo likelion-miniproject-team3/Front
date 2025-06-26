@@ -465,20 +465,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const field = userInfo?.field;
 
-        let targetPage = 'home.html'; // 기본값
+        let targetPage = '/home/home.html'; // 기본값
 
         switch (field) {
           case '대학원 진학형':
-            targetPage = 'daehakwon.html';
+            targetPage = '/home/daehakwon/daehakwon.html';
             break;
           case '빅데이터 분야':
-            targetPage = 'bigdata.html';
+            targetPage = '/home/bigdata/bigdata.html';
             break;
           case 'AI/클라우드 분야':
-            targetPage = 'ai.html';
+            targetPage = '/home/ai/ai.html';
             break;
           case '마이크로 전공형':
-            targetPage = 'micro.html';
+            targetPage = '/home/micro/micro.html';
             break;
         }
 

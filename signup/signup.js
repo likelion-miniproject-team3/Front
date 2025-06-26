@@ -298,20 +298,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (validateStep4()) {
       const field = selectedFieldText.textContent.trim(); // 여기만 수정
 
-      let redirectPage = 'home.html'; // 기본값
+      let redirectPage = '/home/home.html'; // 기본값
 
       switch (field) {
         case '대학원 진학형':
-          redirectPage = 'daehakwon.html';
+          redirectPage = location.origin + '/home/daehakwon/daehakwon.html';
           break;
         case '빅데이터 분야':
-          redirectPage = 'bigdata.html';
+          redirectPage = location.origin + '/home/bigdata/bigdata.html';
           break;
         case 'AI/클라우드 분야':
-          redirectPage = 'ai.html';
+          redirectPage = location.origin + '/home/ai/ai.html';
           break;
         case '마이크로 전공형':
-          redirectPage = 'micro.html';
+          redirectPage = location.origin + '/home/micro/micro.html';
           break;
       }
 
