@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const fieldArrow = document.getElementById('field-dropdown-arrow');
 
   const fillBar = document.querySelector('.fill');
+  const baseUrl = 'http://34.199.232.12:8080';
 
   function setError(input, errorDiv, message) {
     errorDiv.textContent = message;
@@ -35,6 +36,25 @@ document.addEventListener('DOMContentLoaded', () => {
       input.classList.add('error'); // select 박스 빨간 테두리
     } else {
       input.style.borderBottomColor = '#e74c3c'; // 인풋 밑줄 빨강
+    }
+  }
+
+  function clearError(input, errorDiv) {
+    errorDiv.textContent = '';
+    errorDiv.classList.remove('active');
+    input.previousElementSibling.style.color = '#3b6ef7'; // 라벨 파랑
+    input.style.borderBottomColor = '#3b6ef7'; // 밑줄 파랑
+  }
+
+  function clearAllError(input, errorDiv) {
+    errorDiv.textContent = '';
+    errorDiv.classList.remove('active');
+    input.previousElementSibling.style.color = '#aaa';
+
+    if (input.tagName === 'SELECT') {
+      input.classList.remove('error'); // 테두리 원래대로
+    } else {
+      input.style.borderBottomColor = '#ccc';
     }
   }
 
@@ -275,10 +295,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  submitBtn.addEventListener('click', () => {
-    if (validateStep4()) {
-      const field = selectedFieldText.textContent.trim(); // 여기만 수정
+  submitBtn.addEventListener('click', async () => {
+    if (!validateStep4()) return;
 
+    //  HEAD:FRONT-END/signup.js
+    const field = selectedFieldText.textContent.trim();
+    console.log('선택된 분야:', field); // ✅ 추가
+
+    try {
+      const res = await fetch(`${baseUrl}/api/auth/register/step4`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text(); // ❗️서버 에러 메시지 확인
+        throw new Error('4단계 등록 실패: ' + errorText);
+      }
       let redirectPage = '/home/home.html'; // 기본값
 
       switch (field) {
@@ -294,9 +328,12 @@ document.addEventListener('DOMContentLoaded', () => {
         case '마이크로 전공형':
           redirectPage = location.origin + '/home/micro/micro.html';
           break;
+        // >>>>>>> 7abb00215ca7ed08cc53b2e9dec4d96a2ff71a5a:signup/signup.js
       }
 
-      // 나머지 로직 유지
+      console.log('서버 응답 성공! confetti 실행');
+
+      // 여기부터가 화면 전환 부분
       document.querySelector('.top-bar').style.display = 'none';
       document.querySelectorAll('.step').forEach((el) => {
         el.style.display = 'none';
@@ -331,9 +368,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       document.body.appendChild(container);
       document.body.appendChild(confirmBtn);
-      fillBar.style.width = '25%';
-
-      document.querySelectorAll('input').forEach((input) => (input.value = ''));
+    } catch (err) {
+      alert(err.message); // ❗️실패 사유 표시
     }
   });
 
@@ -398,6 +434,34 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  nextBtn1.addEventListener('click', async () => {
+    const username = step1Inputs[0].value.trim();
+    const usernickname = step1Inputs[1].value.trim();
+    const useremail = step1Inputs[2].value.trim();
+    const usernumber = step1Inputs[3].value.trim();
+
+    try {
+      const res = await fetch(`${baseUrl}/api/auth/register/step1`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          nickname: usernickname,
+          email: useremail,
+          studentNumber: usernumber,
+        }),
+      });
+
+      if (!res.ok) throw new Error('1단계 등록 실패');
+
+      // 성공한 경우에만 넘어가기
+      showStep(1);
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
   const useridInput = document.getElementById('userid');
   const nextBtn2 = document.getElementById('next2');
 
@@ -408,6 +472,27 @@ document.addEventListener('DOMContentLoaded', () => {
       nextBtn2.classList.remove('active');
     }
   });
+
+  nextBtn2.addEventListener('click', async () => {
+    const userId = useridInput.value.trim();
+
+    if (!validateStep2()) return;
+
+    try {
+      const res = await fetch(`${baseUrl}/api/auth/register/step2`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (!res.ok) throw new Error('2단계 등록 실패');
+
+      showStep(2);
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
   const passwordInput = document.getElementById('password');
   const passwordCheckInput = document.getElementById('password-check');
   const nextBtn3 = document.getElementById('next3');
@@ -422,6 +507,27 @@ document.addEventListener('DOMContentLoaded', () => {
       nextBtn3.classList.remove('active');
     }
   }
+
+  nextBtn3.addEventListener('click', async () => {
+    const password = passwordInput.value.trim();
+    const passwordCheck = passwordCheckInput.value.trim();
+
+    if (!validateStep3()) return;
+
+    try {
+      const res = await fetch(`${baseUrl}/api/auth/register/step3`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!res.ok) throw new Error('3단계 등록 실패');
+
+      showStep(3);
+    } catch (err) {
+      alert(err.message);
+    }
+  });
 
   passwordInput.addEventListener('input', validatePasswords);
   passwordCheckInput.addEventListener('input', validatePasswords);
@@ -442,4 +548,5 @@ document.addEventListener('DOMContentLoaded', () => {
       checkFieldSelected();
     });
   });
+  console.log('최신 수정 반영 테스트');
 });

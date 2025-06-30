@@ -1,8 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const selectedReviewInfo = JSON.parse(
-    localStorage.getItem('selectedSubjectForReview') || 'null'
-  );
-
   const searchInput = document.getElementById('searchInput');
   const subjectButtons = document.getElementById('subject-buttons');
   const gradeButtons = document.querySelectorAll('.grade-btn');
@@ -14,9 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const writeForm = document.getElementById('write-form');
   const textarea = document.querySelector('#write-form textarea');
   const submitBtn = document.getElementById('submit-review');
-  const savedReviews = JSON.parse(
-    localStorage.getItem('lectureReviews') || '[]'
-  );
   const reviewContainer = document.querySelector('.lecture-reviews');
   const examTypeSelect = document.getElementById('exam-type-selected');
   const examTypeText = document.getElementById('exam-type-selected-text');
@@ -27,22 +20,43 @@ document.addEventListener('DOMContentLoaded', () => {
   const uploadArea = document.getElementById('upload-area');
   const fileInput = document.getElementById('fileInput');
   let filePath = '';
+  const baseUrl = 'http://34.199.232.12:8080';
+
   const savedUserInfo = JSON.parse(localStorage.getItem('userInfo'));
   const nickname = savedUserInfo?.usernickname || '익명';
 
-  savedReviews.forEach((review) => {
-    const card = document.createElement('div');
-    card.className = 'review-card';
-    card.innerHTML = `
-    <div class="review-stars">⭐ ${review.stars}점</div>
-    <div class="review-semester">${review.semester}</div>
-    <div class="review-content">${review.content}</div>
-  `;
-    reviewContainer.appendChild(card);
-  });
-
-  // 배경 제거 (디자인용)
-  reviewContainer.style.backgroundColor = 'transparent';
+  const courseIdMap = {
+    '데이터 분석 기초': 1,
+    '인공지능 개론': 2,
+    '객체지향 프로그램': 3,
+    미적분학: 4,
+    '프로그래밍 기초': 5,
+    '통계 기초': 6,
+    '인공지능 수학': 7,
+    'SW/HW 플랫폼 설계': 8,
+    통계실무: 9,
+    '인공지능 프로그램': 10,
+    운영체제: 11,
+    '데이터 사이언스': 12,
+    '빅데이터 처리': 13,
+    '인공지능 플랫폼 설계': 14,
+    '데이터 마이닝 및 응용 실습': 15,
+    '소프트웨어 공학': 16,
+    '클라우드 컴퓨팅': 17,
+    'AI 정보보안': 18,
+    딥러닝: 19,
+    정밀의료: 20,
+    '멀티모달 학습': 21,
+    '의료 DB 설계': 22,
+    자료구조: 23,
+    '데이터 모델 및 시각화': 24,
+    '자동화 이론': 25,
+    '알고리즘 분석': 26,
+    '의료 전문가 시스템': 27,
+    '의사결정 지원 시스템': 28,
+    'BM 프로젝트': 29,
+    졸업논문: 30,
+  };
 
   const subjects = {
     '1학년': [
@@ -86,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     '인공지능 개론': '1학기 · 필수',
     '객체지향 프로그램': '1학기 · 필수',
     미적분학: '1학기 · 선택',
-    '프로그래밍 기초': '1학기 · 필수1',
+    '프로그래밍 기초': '1학기 · 필수',
     '통계 기초': '1학기 · 필수',
     '인공지능 수학': '1학기 · 필수',
     'SW/HW 플랫폼 설계': '2학기 · 필수',
@@ -140,56 +154,16 @@ document.addEventListener('DOMContentLoaded', () => {
       .join('');
   }
 
-  renderSubjects(subjects[currentGrade]);
-
-  // 학년 버튼 누르면 각 학년에 맞게 과목 나오도록 하는 거
   gradeButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       gradeButtons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-
       currentGrade = btn.querySelector('span').textContent;
       searchInput.value = '';
       renderSubjects(subjects[currentGrade]);
-      if (selectedReviewInfo && selectedReviewInfo.mode === 'lectureWrite') {
-        const subjectName = selectedReviewInfo.subject;
-        document.getElementById('subject-title').textContent = subjectName;
-
-        renderRating();
-        loadLectureReviews(subjectName);
-        loadExamReviews(subjectName);
-
-        subjectButtons.style.display = 'none';
-        searchBar.style.display = 'none';
-        gradeButtonGroup.style.display = 'none';
-        textHeading.style.display = 'none';
-
-        writeForm.style.display = 'block';
-        window.scrollTo({ top: 0 });
-
-        document.getElementById('write-form-title').textContent =
-          '강의평 작성하기';
-        document.getElementById('semester-label').textContent =
-          '수강한 학기를 선택해 주세요.';
-        document.getElementById('exam-type-select').style.display = 'none';
-        document.querySelector('.write-rating').style.display = 'flex';
-        document.querySelector('.divider').style.display = 'block';
-        uploadArea.style.display = 'none';
-        textarea.placeholder = '이 강의에 대한 평가를 작성해 주세요.';
-        textarea.classList.remove('exam-placeholder');
-        updateStars(0);
-        textarea.value = '';
-        selectedText.textContent = '수강 학기';
-        selectedText.style.color = '#3b6ef7';
-        submitBtn.style.backgroundColor = '#f7f8fc';
-        submitBtn.style.color = '#3b6ef7';
-
-        localStorage.removeItem('selectedSubjectForReview');
-      }
     });
   });
 
-  // 검색 기능
   searchInput.addEventListener('input', () => {
     const keyword = searchInput.value.trim().toLowerCase();
     if (keyword === '') {
@@ -203,19 +177,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 과목 버튼 누르면 후기 화면으로 전환
   document.addEventListener('click', function (e) {
     const subjectBtn = e.target.closest('.subject-btn');
     if (subjectBtn) {
       const subjectName = subjectBtn.querySelector('.name').textContent;
       document.getElementById('subject-title').textContent = subjectName;
 
-      // document.querySelector('.stars').innerHTML = '☆☆☆☆☆';
-      // document.querySelector('.rating-score').innerHTML = '';
-
-      renderRating();
+      renderRating(subjectName);
       loadLectureReviews(subjectName);
-      loadExamReviews(subjectName); // ← 이거 추가!
+      loadExamReviews(subjectName);
 
       subjectButtons.style.display = 'none';
       searchBar.style.display = 'none';
@@ -225,202 +195,83 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  //  뒤로 가기 버튼 : 누르면 다시 과목 검색창으로
   backButton.addEventListener('click', () => {
     reviewDetail.style.display = 'none';
-
-    // ✅ 다시 보여줘야 하는 것들
     subjectButtons.style.display = 'flex';
     searchBar.style.display = 'flex';
     gradeButtonGroup.style.display = 'flex';
     textHeading.style.display = 'block';
-
-    // ✅ 스크롤 맨 위로 (선택 사항)
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  function renderRating() {
-    const subjectName = document.getElementById('subject-title').textContent;
-    const saved = JSON.parse(
-      localStorage.getItem(`lecture-${subjectName}`) || '[]'
-    );
+  async function loadLectureReviews(subjectName) {
+    const courseId = courseIdMap[subjectName];
+    const res = await fetch(`${baseUrl}/api/courses/${courseId}/evaluations`);
+    const reviews = await res.json();
 
-    let average = 0;
-    let count = saved.length;
+    const container = document.querySelector('.lecture-reviews');
+    container.innerHTML = '';
 
-    if (count > 0) {
-      const total = saved.reduce((sum, item) => sum + Number(item.stars), 0);
-      average = total / count;
-    }
+    reviews.forEach((review) => {
+      const card = document.createElement('div');
+      card.className = 'review-card';
+      const stars = getStarHTML(review.stars);
 
-    // 별 UI 업데이트
+      card.innerHTML = `
+      <div class="review-header">
+        <div class="profile-img">
+          ${
+            review.profileImage
+              ? `<img src="${review.profileImage}" alt="profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
+              : `<svg xmlns="http://www.w3.org/2000/svg" class="default-profile-icon" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 4-6 8-6s8 2 8 6" /></svg>`
+          }
+        </div>
+        <div class="review-info">
+          <div class="nickname">${review.nickname || '익명'}</div>
+          <div class="semester small-gray">${review.semester}</div>
+        </div>
+        <div class="review-stars">${stars}</div>
+      </div>
+      <div class="review-content">${review.content}</div>
+    `;
+
+      container.appendChild(card);
+    });
+  }
+
+  async function renderRating(subjectName) {
+    const courseId = courseIdMap[subjectName];
+    const res = await fetch(`${baseUrl}/api/courses/${courseId}/evaluations`);
+    const reviews = await res.json();
+
+    let total = 0;
+    let count = reviews.length;
+
+    reviews.forEach((r) => (total += Number(r.stars)));
+
+    const avg = count ? total / count : 0;
+
     const starsElem = document.querySelector('.stars');
     const scoreElem = document.querySelector('.rating-score');
 
     let starHTML = '';
     for (let i = 1; i <= 5; i++) {
-      starHTML += i <= Math.round(average) ? '★' : '☆';
+      starHTML += i <= Math.round(avg) ? '★' : '☆';
     }
 
     starsElem.innerHTML = starHTML;
-    scoreElem.innerHTML = `<strong>${average.toFixed(
+    scoreElem.innerHTML = `<strong>${avg.toFixed(
       1
     )}</strong><span>(${count})</span>`;
   }
 
-  // 평가하기 버튼 누르면 작성 폼 보여주기
-  // 평가하기 버튼 → 작성 폼 보여주기
-  document.querySelectorAll('.write-button').forEach((button) => {
-    button.addEventListener('click', () => {
-      const isExamButton = button.textContent.includes('등록하기');
-      const subjectName = document.getElementById('subject-title').textContent;
-
-      reviewDetail.style.display = 'none';
-      writeForm.style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      const dividers = document.querySelectorAll('.divider');
-      dividers.forEach((divider) => {
-        divider.style.display = isExamButton ? 'none' : 'block';
-      });
-
-      document.getElementById('uploaded-images').innerHTML = '';
-
-      // ✅ 기본 초기화
-      updateStars(0);
-      textarea.value = '';
-      selectedText.textContent = isExamButton ? '응시 학기' : '수강 학기';
-      selectedText.style.color = '#3b6ef7';
-      submitBtn.style.backgroundColor = '#f7f8fc';
-      submitBtn.style.color = '#3b6ef7';
-
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const nickname = userInfo?.usernickname?.trim() || '익명';
-
-      if (isExamButton) {
-        // ✅ 시험 정보 등록 모드
-        document.getElementById('write-form-title').textContent =
-          '시험 정보 등록하기';
-        document.getElementById('semester-label').textContent =
-          '응시한 학기를 선택해 주세요.';
-        document.getElementById('exam-type-select').style.display = 'block';
-        document.querySelector('.write-rating').style.display = 'none';
-        document.querySelector('.divider').style.display = 'none';
-        uploadArea.style.display = 'inline-block';
-        textarea.style.marginTop = '-20px';
-        textarea.placeholder = '예시) 시험꿀팁, 주의사항, 문제유형 등';
-        textarea.classList.add('exam-placeholder');
-        examTypeText.textContent = '응시 회차';
-        examTypeText.style.color = '#3b6ef7';
-        examTypeOptions.style.display = 'none';
-        examTypeArrow.classList.remove('rotate');
-
-        // ✅ 기존 시험 정보 불러오기
-        const examKey = `exam-${subjectName}`;
-        const examList = JSON.parse(localStorage.getItem(examKey) || '[]');
-        const existingExam = examList.find(
-          (exam) => exam.nickname === nickname
-        );
-
-        if (existingExam) {
-          textarea.value = existingExam.content;
-          selectedText.textContent = existingExam.semester;
-          selectedText.style.color = '#3b6ef7';
-          examTypeText.textContent = existingExam.type;
-          examTypeText.style.color = '#3b6ef7';
-
-          // 파일 표시
-          if (existingExam.filePath) {
-            const container = document.getElementById('uploaded-images');
-            const fileBox = document.createElement('div');
-            fileBox.className = 'uploaded-image';
-            const fileIcon = document.createElement('div');
-            fileIcon.textContent = '📄';
-            const fileName = document.createElement('div');
-            fileName.textContent = '첨부 파일';
-            const removeBtn = document.createElement('button');
-            removeBtn.className = 'remove-image';
-            removeBtn.textContent = '✕';
-            removeBtn.onclick = () => {
-              fileBox.remove();
-              filePath = ''; // ✅ 이 줄 추가해야 삭제한 파일이 localStorage에 반영됨
-            };
-
-            fileBox.append(fileIcon, fileName, removeBtn);
-            container.appendChild(fileBox);
-            filePath = existingExam.filePath;
-          }
-
-          writeForm.dataset.editMode = 'true';
-        } else {
-          textarea.value = '';
-          selectedText.textContent = '응시 학기';
-          selectedText.style.color = '#3b6ef7';
-          examTypeText.textContent = '응시 회차';
-          examTypeText.style.color = '#3b6ef7';
-          filePath = '';
-          writeForm.dataset.editMode = 'false';
-        }
-      } else {
-        // ✅ 강의평 작성 모드
-        document.getElementById('write-form-title').textContent =
-          '강의평 작성하기';
-        document.getElementById('semester-label').textContent =
-          '수강한 학기를 선택해 주세요.';
-        document.getElementById('exam-type-select').style.display = 'none';
-        document.querySelector('.write-rating').style.display = 'flex';
-        document.querySelector('.divider').style.display = 'block';
-        uploadArea.style.display = 'none';
-        textarea.style.marginTop = '-20px';
-        textarea.placeholder = '이 강의에 대한 평가를 작성해 주세요.';
-        textarea.classList.remove('exam-placeholder');
-
-        // ✅ 기존 강의평 불러오기
-        const reviewKey = `lecture-${subjectName}`;
-        const reviews = JSON.parse(localStorage.getItem(reviewKey) || '[]');
-        const existingReview = reviews.find((r) => r.nickname === nickname);
-
-        if (existingReview) {
-          updateStars(parseInt(existingReview.stars));
-          textarea.value = existingReview.content;
-          selectedText.textContent = existingReview.semester;
-          selectedText.style.color = '#3b6ef7';
-          writeForm.dataset.editMode = 'true';
-        } else {
-          updateStars(0);
-          textarea.value = '';
-          selectedText.textContent = '수강 학기';
-          selectedText.style.color = '#3b6ef7';
-          writeForm.dataset.editMode = 'false';
-        }
-      }
-    });
-  });
-
-  // 돌아가기 버튼 → 기존 상세 화면으로
-  document.getElementById('write-back-button').addEventListener('click', () => {
-    writeForm.style.display = 'none';
-    reviewDetail.style.display = 'block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-
-  // 별점 클릭 처리
   const stars = document.querySelectorAll('.write-stars span');
   const scoreDisplay = document.querySelector('.write-score');
-
-  updateStars(0);
-
-  stars.forEach((star) => {
-    star.addEventListener('click', () => {
-      const rating = parseInt(star.getAttribute('data-value'));
-      updateStars(rating);
-    });
-  });
 
   let currentRating = 0;
 
   function updateStars(rating) {
-    stars.forEach((star) => {
+    stars.forEach((별) => {
       const value = parseInt(star.getAttribute('data-value'));
       if (value <= rating) {
         star.classList.add('active');
@@ -431,33 +282,37 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    scoreDisplay.textContent = `${rating}/5`;
+    scoreDisplay.textContent = `${rating}`;
+    currentRating = rating;
   }
+
+  stars.forEach((별) => {
+    star.addEventListener('click', () => {
+      const rating = parseInt(star.getAttribute('data-value'));
+      updateStars(rating);
+    });
+  });
+
   const selected = document.getElementById('selected');
   const selectedText = document.getElementById('selected-text');
   const options = document.getElementById('options');
+  const dropdownArrow = document.getElementById('dropdown-arrow');
 
-  // 토글 드롭다운 열기/닫기
   selected.addEventListener('click', () => {
     const isOpen = options.style.display === 'block';
     options.style.display = isOpen ? 'none' : 'block';
-
-    // 화살표 회전
     dropdownArrow.classList.toggle('rotate', !isOpen);
   });
 
-  // 항목 클릭 시 선택
   options.querySelectorAll('li').forEach((li) => {
     li.addEventListener('click', () => {
       selectedText.textContent = li.textContent;
-      selectedText.style.color = '#3b6ef7'; // 선택된 값도 파란색 유지
+      selectedText.style.color = '#3b6ef7';
       options.style.display = 'none';
-
       dropdownArrow.classList.remove('rotate');
     });
   });
 
-  // 외부 클릭 시 닫기
   document.addEventListener('click', (e) => {
     if (!document.getElementById('custom-select').contains(e.target)) {
       options.style.display = 'none';
@@ -465,47 +320,184 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  textarea.addEventListener('input', () => {
+  submitBtn.addEventListener('click', async () => {
     const isExamMode =
       document.getElementById('write-form-title').textContent ===
       '시험 정보 등록하기';
+    const subjectName = document.getElementById('subject-title').textContent;
+    const courseId = courseIdMap[subjectName];
+    const content = textarea.value.trim();
+    const semester = selectedText.textContent.trim();
+    const examType = examTypeText.textContent.trim();
+    const stars = parseInt(scoreDisplay.textContent);
 
-    if (textarea.value.length > 20) {
-      submitBtn.style.backgroundColor = '#3b6ef7'; // 파란색 배경
-      submitBtn.style.color = 'white'; // 흰색 글자
+    if (isExamMode) {
+      if (semester === '응시 학기')
+        return showCustomAlert('응시 학기를 선택해주세요.');
+      if (examType === '응시 회차')
+        return showCustomAlert('응시 회차를 선택해주세요.');
+      if (content.length < 20)
+        return showCustomAlert('시험 정보를 20자 이상 입력해주세요.');
 
-      if (isExamMode) {
-        submitBtn.textContent = '등록하기'; // ← 텍스트 변경
-      } else {
-        submitBtn.textContent = '작성하기';
+      const payload = {
+        semester,
+        type: examType,
+        content,
+        nickname,
+        filePath,
+        profileImage: savedUserInfo?.profileImage || '',
+      };
+
+      const res = await fetch(`${baseUrl}/api/courses/${courseId}/exams`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        showCustomAlert('시험 정보가 등록되었습니다.');
+        textarea.value = '';
+        selectedText.textContent = '응시 학기';
+        examTypeText.textContent = '응시 회차';
+        filePath = '';
+        document.getElementById('uploaded-images').innerHTML = '';
+        writeForm.style.display = 'none';
+        reviewDetail.style.display = 'block';
+        loadExamReviews(subjectName);
       }
-    } else {
-      submitBtn.style.backgroundColor = '#f7f8fc'; // 원래 배경색
-      submitBtn.style.color = '#3b6ef7'; // 원래 글자색
-      submitBtn.textContent = '작성하기'; // 20자 이하일 땐 작성하기로 고정
+      return;
+    }
+
+    // 강의평
+    if (!stars || isNaN(stars)) return showCustomAlert('별점을 입력해주세요.');
+    if (semester === '수강 학기')
+      return showCustomAlert('수강 학기를 선택해주세요.');
+    if (content.length < 20)
+      return showCustomAlert('강의평을 20자 이상 작성해주세요.');
+
+    const payload = {
+      stars,
+      semester,
+      content,
+      nickname,
+      profileImage: savedUserInfo?.profileImage || '',
+    };
+
+    const res = await fetch(`${baseUrl}/api/courses/${courseId}/evaluations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      showCustomAlert('강의평이 등록되었습니다.');
+      textarea.value = '';
+      selectedText.textContent = '수강 학기';
+      renderRating(subjectName);
+      loadLectureReviews(subjectName);
+      updateStars(0);
+      writeForm.style.display = 'none';
+      reviewDetail.style.display = 'block';
     }
   });
 
-  const currentPage = window.location.pathname.split('/').pop();
+  async function loadExamReviews(subjectName) {
+    const courseId = courseIdMap[subjectName];
+    const res = await fetch(`${baseUrl}/api/courses/${courseId}/exams`);
+    const list = await res.json();
+    const container = document.querySelector('.exam-reviews');
+    container.innerHTML = '';
 
-  // ✅ 맨 아래에 이 코드 추가 (또는 기존 홈 버튼 처리 부분 바꾸기)
+    list.forEach((item) => {
+      const box = document.createElement('div');
+      box.className = 'review-card';
+      box.innerHTML = `
+      <div class="review-header">
+        <div class="profile-img">
+          ${
+            item.profileImage
+              ? `<img src="${item.profileImage}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+              : `<svg xmlns="http://www.w3.org/2000/svg" class="default-profile-icon" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>`
+          }
+        </div>
+        <div class="review-meta">
+          <strong class="nickname">${item.nickname}</strong>
+          <div class="exam-subinfo">${item.semester} · ${item.type}</div>
+        </div>
+        ${
+          item.filePath
+            ? `<a href="${item.filePath}" download class="download-link show-alert">
+              자료
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b6ef7" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </a>`
+            : ''
+        }
+      </div>
+      <div class="review-content">${item.content}</div>`;
+      container.appendChild(box);
+    });
+  }
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const container = document.getElementById('uploaded-images');
+    container.innerHTML = '';
+    if (file) {
+      filePath = URL.createObjectURL(file);
+      const fileBox = document.createElement('div');
+      fileBox.className = 'uploaded-image';
+      const fileIcon = document.createElement('div');
+      fileIcon.textContent = '📄';
+      const fileName = document.createElement('div');
+      fileName.textContent = file.name;
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'remove-image';
+      removeBtn.textContent = '✕';
+      removeBtn.onclick = () => {
+        fileBox.remove();
+        filePath = '';
+      };
+      fileBox.append(fileIcon, fileName, removeBtn);
+      container.appendChild(fileBox);
+    }
+  });
+
+  function getStarHTML(score) {
+    const full = Math.round(score);
+    return '★'.repeat(full) + '☆'.repeat(5 - full);
+  }
+
+  function showCustomAlert(message) {
+    const alertBox = document.getElementById('custom-alert');
+    const alertMessage = document.getElementById('custom-alert-message');
+    const alertOkBtn = document.getElementById('custom-alert-ok');
+    alertMessage.textContent = message;
+    alertBox.style.display = 'flex';
+    alertOkBtn.onclick = () => {
+      alertBox.style.display = 'none';
+    };
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('.show-alert')) {
+      setTimeout(() => {
+        showCustomAlert('자료가 저장되었습니다.');
+      }, 500);
+    }
+  });
+
+  // bottom nav 홈 버튼 클릭 시 분야에 맞게 이동
+  const currentPage = window.location.pathname.split('/').pop();
   document.querySelectorAll('.bottom-nav .nav-item').forEach((item) => {
     const href = item.getAttribute('href');
+    if (href === currentPage) item.classList.add('active');
 
-    if (href === currentPage) {
-      item.classList.add('active');
-    }
-
-    // 홈 버튼 클릭 시 희망 분야에 따라 이동
     if (href === 'home.html') {
       item.addEventListener('click', (e) => {
         e.preventDefault();
-
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const field = userInfo?.field;
-
-        let targetPage = '/home/home.html'; // 기본값
-
+        let targetPage = '/home/home.html';
         switch (field) {
           case '대학원 진학형':
             targetPage = '/home/daehakwon/daehakwon.html';
@@ -520,523 +512,9 @@ document.addEventListener('DOMContentLoaded', () => {
             targetPage = '/home/micro/micro.html';
             break;
         }
-
         window.location.href = targetPage;
       });
     }
   });
-
-  // 컨테이너 생기도록
-  submitBtn.addEventListener('click', function () {
-    const isExamMode =
-      document.getElementById('write-form-title').textContent ===
-      '시험 정보 등록하기';
-
-    const content = textarea.value.trim();
-    const selectedSemester = selectedText.textContent.trim();
-    const selectedExamType = examTypeText.textContent.trim();
-    const subjectName = document.getElementById('subject-title').textContent;
-    const selectedStars = parseInt(scoreDisplay.textContent);
-    const semester = selectedSemester;
-    const examType = selectedExamType;
-
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const nickname = userInfo?.usernickname?.trim() || '익명';
-
-    const isEdit = writeForm.dataset.editMode === 'true';
-
-    if (isExamMode) {
-      if (semester === '응시 학기') {
-        showCustomAlert('응시 학기를 선택해주세요.');
-        return;
-      }
-      if (examType === '응시 회차') {
-        showCustomAlert('응시 회차를 선택해주세요.');
-        return;
-      }
-      if (content === '') {
-        showCustomAlert('시험 정보를 입력해주세요.');
-        return;
-      }
-      if (content.length < 20) {
-        showCustomAlert('시험 정보를 더 자세히 작성해주세요.');
-        return;
-      }
-
-      const examKey = `exam-${subjectName}`;
-      const savedExams = JSON.parse(localStorage.getItem(examKey) || '[]');
-
-      if (isEdit) {
-        const target = savedExams.find((e) => e.nickname === nickname);
-        if (target) {
-          target.semester = semester;
-          target.type = examType;
-          target.content = content;
-          target.filePath = filePath && filePath !== '' ? filePath : '';
-        }
-
-        const allExamCards = document.querySelectorAll(
-          '.exam-reviews .review-card'
-        );
-        for (const card of allExamCards) {
-          const nicknameElem = card.querySelector('.nickname');
-          if (nicknameElem && nicknameElem.textContent === nickname) {
-            card.querySelector(
-              '.exam-subinfo'
-            ).textContent = `${semester} · ${examType}`;
-            card.querySelector('.review-content').textContent = content;
-
-            const download = card.querySelector('.download-link');
-            if (filePath) {
-              if (!download) {
-                const newDownload = document.createElement('a');
-                newDownload.className = 'download-link';
-                newDownload.href = filePath;
-                newDownload.download = '';
-                newDownload.onclick = () =>
-                  showCustomAlert('자료가 저장되었습니다.');
-                newDownload.innerHTML = `자료 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px; vertical-align: middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>`;
-                card.querySelector('.review-header').appendChild(newDownload);
-              } else {
-                download.href = filePath;
-              }
-            } else {
-              if (download) download.remove();
-            }
-          }
-        }
-      } else {
-        const newExam = document.createElement('div');
-        newExam.className = 'review-card exam';
-
-        newExam.innerHTML = `
-        <div class="review-header">
-          <div class="profile-img">
-            ${
-              userInfo?.profileImage
-                ? `<img src="${userInfo.profileImage}" alt="profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
-                : `<svg xmlns="http://www.w3.org/2000/svg" class="default-profile-icon" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 4-6 8-6s8 2 8 6" /></svg>`
-            }
-          </div>
-          <div class="review-meta">
-            <strong class="nickname">${nickname}</strong>
-            <div class="exam-subinfo">${semester} · ${examType}</div>
-          </div>
-          ${
-            filePath
-              ? `<a href="${filePath}" download class="download-link" onclick="showCustomAlert('자료가 저장되었습니다.')">
-            자료
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px; vertical-align: middle;">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-          </a>`
-              : ''
-          }
-        </div>
-        <div class="review-content">${content}</div>`;
-
-        document.querySelector('.exam-reviews').appendChild(newExam);
-        savedExams.push({
-          semester,
-          type: examType,
-          content,
-          nickname,
-          filePath: filePath || '',
-        });
-      }
-
-      localStorage.setItem(examKey, JSON.stringify(savedExams));
-
-      textarea.value = '';
-      selectedText.textContent = '응시 학기';
-      selectedText.style.color = '#3b6ef7';
-      examTypeText.textContent = '응시 회차';
-      examTypeText.style.color = '#3b6ef7';
-      document.getElementById('uploaded-images').innerHTML = '';
-      filePath = '';
-
-      writeForm.style.display = 'none';
-      reviewDetail.style.display = 'block';
-      renderRating();
-      loadExamReviews(subjectName);
-
-      document.querySelectorAll('.divider').forEach((d) => {
-        d.style.display = 'block';
-      });
-      return;
-    }
-
-    // 강의평 처리 (별점/학기/내용 검증)
-    if (isNaN(selectedStars) || selectedStars === 0) {
-      showCustomAlert('강의의 별점을 매겨주세요.');
-      return;
-    }
-    if (semester === '수강 학기') {
-      showCustomAlert('수강 학기를 선택해주세요.');
-      return;
-    }
-    if (content === '') {
-      showCustomAlert('강의평을 작성해주세요.');
-      return;
-    }
-    if (content.length < 20) {
-      showCustomAlert('강의평을 더 자세히 작성해주세요.');
-      return;
-    }
-
-    const reviewKey = `lecture-${subjectName}`;
-    const saved = JSON.parse(localStorage.getItem(reviewKey) || '[]');
-
-    if (isEdit) {
-      const target = saved.find((r) => r.nickname === nickname);
-      if (target) {
-        target.stars = selectedStars;
-        target.semester = semester;
-        target.content = content;
-      }
-
-      const allCards = document.querySelectorAll(
-        '.lecture-reviews .review-card'
-      );
-      for (const card of allCards) {
-        const nicknameElem = card.querySelector('.nickname');
-        if (nicknameElem && nicknameElem.textContent === nickname) {
-          card.querySelector('.semester').textContent = semester;
-          card.querySelector('.review-content').textContent = content;
-          card.querySelector('.review-stars').innerHTML =
-            getStarHTML(selectedStars);
-        }
-      }
-    } else {
-      const newReview = document.createElement('div');
-      newReview.className = 'review-card';
-      const stars = getStarHTML(selectedStars);
-
-      newReview.innerHTML = `
-      <div class="review-header">
-        <div class="left-section">
-          <div class="profile-img">
-            ${
-              userInfo?.profileImage
-                ? `<img src="${userInfo.profileImage}" alt="profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
-                : `<svg xmlns="http://www.w3.org/2000/svg" class="default-profile-icon" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 4-6 8-6s8 2 8 6" /></svg>`
-            }
-          </div>
-          <div class="info">
-            <div class="nickname">${nickname}</div>
-            <div class="semester small-gray">${semester}</div>
-          </div>
-        </div>
-        <div class="review-stars">${stars}</div>
-      </div>
-      <div class="review-content">${content}</div>
-    `;
-      document.querySelector('.lecture-reviews').appendChild(newReview);
-
-      saved.push({ semester, stars: selectedStars, content, nickname });
-    }
-
-    localStorage.setItem(reviewKey, JSON.stringify(saved));
-
-    textarea.value = '';
-    selectedText.textContent = '수강 학기';
-    selectedText.style.color = '#3b6ef7';
-    renderRating();
-    updateStars(0);
-    writeForm.style.display = 'none';
-    reviewDetail.style.display = 'block';
-  });
-
-  examTypeSelect.addEventListener('click', () => {
-    const isOpen = examTypeOptions.style.display === 'block';
-    examTypeOptions.style.display = isOpen ? 'none' : 'block';
-    examTypeArrow.classList.toggle('rotate', !isOpen);
-  });
-
-  examTypeOptions.querySelectorAll('li').forEach((li) => {
-    li.addEventListener('click', () => {
-      examTypeText.textContent = li.textContent;
-      examTypeText.style.color = '#3b6ef7';
-      examTypeOptions.style.display = 'none';
-      examTypeArrow.classList.remove('rotate');
-    });
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!examTypeSelect.contains(e.target)) {
-      examTypeOptions.style.display = 'none';
-      examTypeArrow.classList.remove('rotate');
-    }
-  });
-  function loadExamReviews(subjectName) {
-    const examList =
-      JSON.parse(localStorage.getItem(`exam-${subjectName}`)) || [];
-    const container = document.querySelector('.exam-reviews');
-    container.innerHTML = '';
-
-    examList.forEach((item) => {
-      const box = document.createElement('div');
-      box.className = 'review-card';
-
-      box.innerHTML = `
-  <div class="review-header">
-    <div class="profile-img"></div>
-    <div class="review-meta">
-      <strong class="nickname">${item.nickname || '익명'}</strong>
-      <div class="exam-subinfo">${item.semester} · ${item.type}</div>
-    </div>
-    ${
-      item.filePath
-        ? `<a href="${item.filePath}" download class="download-link show-alert">
-            자료
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px; vertical-align: middle;">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-          </a>`
-        : ''
-    }
-  </div>
-  <div class="review-content">${item.content}</div>
-`;
-
-      container.appendChild(box);
-    });
-  }
-
-  function loadLectureReviews(subjectName) {
-    const reviewKey = `lecture-${subjectName}`;
-    const reviews = JSON.parse(localStorage.getItem(reviewKey) || '[]');
-    const container = document.querySelector('.lecture-reviews');
-    container.innerHTML = '';
-
-    reviews.forEach((review) => {
-      const card = document.createElement('div');
-      card.className = 'review-card';
-
-      const stars = getStarHTML(review.stars);
-
-      card.innerHTML = `
-      <div class="review-header">
-        <div class="profile-img"></div>
-        <div class="review-info">
-          <div class="nickname">${review.nickname || '익명'}</div>
-          <div class="semester small-gray">${review.semester}</div>
-        </div>
-        <div class="review-stars">${stars}</div>
-      </div>
-      <div class="review-content">${review.content}</div>
-    `;
-
-      // ✅ 여기에서 프로필 이미지 삽입
-      const profileDiv = card.querySelector('.profile-img');
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
-      if (userInfo?.profileImage && userInfo.profileImage !== '') {
-        const img = document.createElement('img');
-        img.src = userInfo.profileImage;
-        img.alt = 'profile';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.borderRadius = '50%';
-        img.style.objectFit = 'cover';
-        profileDiv.appendChild(img);
-      } else {
-        profileDiv.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="default-profile-icon" viewBox="0 0 24 24" fill="white">
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
-        </svg>
-      `;
-      }
-
-      container.appendChild(card);
-    });
-  }
-  function loadExamReviews(subjectName) {
-    const examList =
-      JSON.parse(localStorage.getItem(`exam-${subjectName}`)) || [];
-    const container = document.querySelector('.exam-reviews');
-    container.innerHTML = '';
-
-    examList.forEach((item) => {
-      const box = document.createElement('div');
-      box.className = 'review-card';
-
-      box.innerHTML = `
-      <div class="review-header">
-        <div class="profile-img"></div>
-        <div class="review-meta">
-          <strong class="nickname">${item.nickname || '익명'}</strong>
-          <div class="exam-subinfo">${item.semester} · ${item.type}</div>
-        </div>
-        ${
-          item.filePath
-            ? `<a href="${item.filePath}" download class="download-link show-alert">
-                자료
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px; vertical-align: middle;">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-              </a>`
-            : ''
-        }
-      </div>
-      <div class="review-content">${item.content}</div>
-    `;
-
-      // ✅ 여기서 프로필 이미지 넣기
-      const profileDiv = box.querySelector('.profile-img');
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
-      if (userInfo?.profileImage && userInfo.profileImage !== '') {
-        const img = document.createElement('img');
-        img.src = userInfo.profileImage;
-        img.alt = 'profile';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.borderRadius = '50%';
-        img.style.objectFit = 'cover';
-        profileDiv.appendChild(img);
-      } else {
-        profileDiv.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="default-profile-icon" viewBox="0 0 24 24" fill="white">
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
-        </svg>
-      `;
-      }
-
-      container.appendChild(box);
-    });
-  }
-
-  function showCustomAlert(message) {
-    const alertBox = document.getElementById('custom-alert');
-    const alertMessage = document.getElementById('custom-alert-message');
-    const alertOkBtn = document.getElementById('custom-alert-ok');
-
-    alertMessage.textContent = message;
-    alertBox.style.display = 'flex';
-
-    alertOkBtn.onclick = () => {
-      alertBox.style.display = 'none';
-    };
-  }
-
-  uploadButton.addEventListener('click', () => {
-    uploadOptions.classList.toggle('hidden');
-  });
-
-  // 사진 보관함
-  document.getElementById('upload-photo').addEventListener('click', () => {
-    const uploadInput = document.createElement('input');
-    uploadInput.type = 'file';
-    uploadInput.accept = 'image/*';
-    uploadInput.multiple = true;
-    uploadInput.style.display = 'none';
-    document.body.appendChild(uploadInput);
-
-    uploadInput.addEventListener('change', () => {
-      const container = document.getElementById('uploaded-images');
-      Array.from(uploadInput.files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const imageBox = document.createElement('div');
-          imageBox.className = 'uploaded-image';
-
-          const img = document.createElement('img');
-          img.src = e.target.result;
-
-          filePath = e.target.result;
-
-          const removeBtn = document.createElement('button');
-          removeBtn.className = 'remove-image';
-          removeBtn.textContent = '✕';
-          removeBtn.onclick = () => imageBox.remove();
-
-          imageBox.appendChild(img);
-          imageBox.appendChild(removeBtn);
-          container.appendChild(imageBox);
-        };
-        reader.readAsDataURL(file);
-      });
-      uploadInput.remove(); // 메모리 누수 방지
-    });
-
-    uploadInput.click();
-    uploadOptions.classList.add('hidden');
-  });
-
-  // 일반 파일 선택
-  document.getElementById('upload-file').addEventListener('click', () => {
-    fileInput.accept = '*/*';
-    fileInput.click();
-    uploadOptions.classList.add('hidden');
-  });
-
-  // 파일 선택 후 처리
-  fileInput.addEventListener('change', (e) => {
-    const container = document.getElementById('uploaded-images');
-    container.innerHTML = ''; // ✅ 기존 내용 초기화 (하나만 선택 가능하도록)
-
-    const file = e.target.files[0];
-    if (file) {
-      filePath = URL.createObjectURL(file);
-      console.log('파일 첨부됨:', filePath);
-
-      const fileBox = document.createElement('div');
-      fileBox.className = 'uploaded-image';
-
-      const fileIcon = document.createElement('div');
-      fileIcon.textContent = '📄';
-      fileIcon.style.fontSize = '24px';
-      fileIcon.style.marginBottom = '4px';
-
-      const fileName = document.createElement('div');
-      fileName.textContent = file.name;
-      fileName.style.fontSize = '11px';
-      fileName.style.textAlign = 'center';
-      fileName.style.wordBreak = 'break-all';
-
-      const removeBtn = document.createElement('button');
-      removeBtn.className = 'remove-image';
-      removeBtn.textContent = '✕';
-      removeBtn.onclick = () => {
-        fileBox.remove();
-        filePath = ''; // ✅ 파일 삭제 시 filePath도 비움
-      };
-
-      fileBox.appendChild(fileIcon);
-      fileBox.appendChild(fileName);
-      fileBox.appendChild(removeBtn);
-      container.appendChild(fileBox);
-    }
-  });
-
-  // fileInput.addEventListener('change', function (e) {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     filePath = URL.createObjectURL(file); // ✅ 전역변수 filePath에 저장
-  //     console.log('파일 첨부됨:', filePath);
-  //   }
-  // });
-
-  function getStarHTML(score) {
-    const full = Math.round(score); // 반올림해서 정수로
-    const empty = 5 - full;
-
-    searchBar.style.display = 'none';
-    gradeButtonGroup.style.display = 'none';
-    textHeading.style.display = 'none';
-
-    reviewDetail.style.display = 'block'; // ✅ 상세화면으로만 이동
-    window.scrollTo({ top: 0 });
-
-    localStorage.removeItem('selectedSubjectForReview');
-  }
+  console.log('최신 수정 반영 테스트');
 });
