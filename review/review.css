@@ -456,9 +456,10 @@ h3.text {
 }
 
 #write-back-button {
+  position: absolute;
+  left: 8px; /* #back-button과 동일 */
   background: none;
   border: none;
-  font-size: 20px;
   cursor: pointer;
 }
 

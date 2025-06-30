@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const selectedReviewInfo = JSON.parse(
+    localStorage.getItem('selectedSubjectForReview') || 'null'
+  );
+
   const searchInput = document.getElementById('searchInput');
   const subjectButtons = document.getElementById('subject-buttons');
   const gradeButtons = document.querySelectorAll('.grade-btn');
@@ -147,6 +151,41 @@ document.addEventListener('DOMContentLoaded', () => {
       currentGrade = btn.querySelector('span').textContent;
       searchInput.value = '';
       renderSubjects(subjects[currentGrade]);
+      if (selectedReviewInfo && selectedReviewInfo.mode === 'lectureWrite') {
+        const subjectName = selectedReviewInfo.subject;
+        document.getElementById('subject-title').textContent = subjectName;
+
+        renderRating();
+        loadLectureReviews(subjectName);
+        loadExamReviews(subjectName);
+
+        subjectButtons.style.display = 'none';
+        searchBar.style.display = 'none';
+        gradeButtonGroup.style.display = 'none';
+        textHeading.style.display = 'none';
+
+        writeForm.style.display = 'block';
+        window.scrollTo({ top: 0 });
+
+        document.getElementById('write-form-title').textContent =
+          '강의평 작성하기';
+        document.getElementById('semester-label').textContent =
+          '수강한 학기를 선택해 주세요.';
+        document.getElementById('exam-type-select').style.display = 'none';
+        document.querySelector('.write-rating').style.display = 'flex';
+        document.querySelector('.divider').style.display = 'block';
+        uploadArea.style.display = 'none';
+        textarea.placeholder = '이 강의에 대한 평가를 작성해 주세요.';
+        textarea.classList.remove('exam-placeholder');
+        updateStars(0);
+        textarea.value = '';
+        selectedText.textContent = '수강 학기';
+        selectedText.style.color = '#3b6ef7';
+        submitBtn.style.backgroundColor = '#f7f8fc';
+        submitBtn.style.color = '#3b6ef7';
+
+        localStorage.removeItem('selectedSubjectForReview');
+      }
     });
   });
 
@@ -1011,4 +1050,23 @@ document.addEventListener('DOMContentLoaded', () => {
   //     localStorage.removeItem(key);
   //   }
   // }); // 작성된 글 초기화
+
+  if (selectedReviewInfo && selectedReviewInfo.mode === 'lectureWrite') {
+    const subjectName = selectedReviewInfo.subject;
+    document.getElementById('subject-title').textContent = subjectName;
+
+    renderRating();
+    loadLectureReviews(subjectName);
+    loadExamReviews(subjectName);
+
+    subjectButtons.style.display = 'none';
+    searchBar.style.display = 'none';
+    gradeButtonGroup.style.display = 'none';
+    textHeading.style.display = 'none';
+
+    reviewDetail.style.display = 'block'; // ✅ 상세화면으로만 이동
+    window.scrollTo({ top: 0 });
+
+    localStorage.removeItem('selectedSubjectForReview');
+  }
 });

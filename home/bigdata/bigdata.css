@@ -5,8 +5,10 @@ body {
 }
 
 .container {
-  max-width: 500px;
+  width: 100%;
+  max-width: 500px; /* PC에서 너무 넓어지지 않게 유지 */
   margin: 0 auto;
+  padding: 0; /* 좌우 패딩 없애기 */
   padding-bottom: 100px;
 }
 
@@ -45,7 +47,7 @@ body {
 .year-buttons {
   display: flex;
   justify-content: flex-start;
-  padding: 0 1rem;
+  padding: 0;
   gap: 8px;
   margin-bottom: 1rem;
 }
@@ -78,7 +80,7 @@ body {
 }
 
 .subject-section {
-  padding: 0 1rem;
+  padding: 0;
   margin-bottom: 1rem;
 }
 
@@ -123,6 +125,17 @@ body {
   transform: translateY(-50%);
   color: white;
   font-size: 1rem;
+  background: none;
+}
+
+.subject-header .goto-home-button {
+  position: absolute;
+  top: 35%;
+  right: 12px; /* 오른쪽으로 붙이기 */
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 /* 하단 흰색 카드 */

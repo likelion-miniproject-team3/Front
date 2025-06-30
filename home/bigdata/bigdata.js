@@ -1,3 +1,36 @@
+function toggleElective(name) {
+  const cleanName = name
+    .replace(/<br>/g, ' ')
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  let savedElectives = JSON.parse(
+    localStorage.getItem('savedElectives') || '[]'
+  );
+  const idx = savedElectives.indexOf(cleanName);
+  if (idx > -1) {
+    savedElectives.splice(idx, 1);
+  } else {
+    savedElectives.push(cleanName);
+  }
+  localStorage.setItem('savedElectives', JSON.stringify(savedElectives));
+}
+
+// 담기 버튼을 클릭할 때마다 로컬스토리지에서 과목을 관리
+function toggleElectiveCourse(name) {
+  let selectedElectives = JSON.parse(
+    localStorage.getItem('selectedElectives') || '[]'
+  );
+  const idx = selectedElectives.indexOf(name);
+  if (idx > -1) {
+    selectedElectives.splice(idx, 1); // 이미 담겼으면 해제
+  } else {
+    selectedElectives.push(name); // 없으면 담기
+  }
+  localStorage.setItem('selectedElectives', JSON.stringify(selectedElectives));
+  renderElectiveSubjectsOnMypage(); // 마이페이지에서 전공 선택 과목을 업데이트
+}
+
 const subjects = [
   {
     name: '데이터 분석 기초',
@@ -111,7 +144,7 @@ const subjects = [
     name: '의사결정 <br> 지원 시스템',
     year: 4,
     semester: '1학기·2학점',
-    type: 'required',
+    type: 'elective',
     desc: 'AI 기반 예측 모델, 전문가 시스템, 통계적 판단 <br> 알고리즘 등을 의사결정 시나리오에 적용합니다.',
     followup: '선이수 과목: 의료DB설계, 정밀의료 ⇆ 후속 과목: BM 프로젝트',
   },
@@ -132,48 +165,103 @@ const requiredContainer = document.getElementById('required-subjects');
 const electiveContainer = document.getElementById('elective-subjects');
 const navItems = document.querySelectorAll('.nav-item');
 const subjectDetailList = document.getElementById('subject-detail-list');
+const completedSubjects = JSON.parse(
+  localStorage.getItem('completedSubjects') || '[]'
+);
 
 let currentYear = 1;
+
+function loadCompletedSubjects() {
+  return JSON.parse(localStorage.getItem('completedSubjects') || '[]');
+}
+
+function saveCompletedSubjects(subjects) {
+  localStorage.setItem('completedSubjects', JSON.stringify(subjects));
+}
+
+function toggleCompletion(subjectName) {
+  const completed = JSON.parse(
+    localStorage.getItem('completedSubjects') || '[]'
+  );
+  const idx = completed.indexOf(subjectName);
+  if (idx > -1) {
+    completed.splice(idx, 1);
+  } else {
+    completed.push(subjectName);
+  }
+  localStorage.setItem('completedSubjects', JSON.stringify(completed));
+}
+
+function setupButtonToggle() {
+  const buttons = document.querySelectorAll(
+    '.subject-buttons .complete-button'
+  );
+  buttons.forEach((btn) => {
+    const subjectName = btn
+      .closest('.subject-info')
+      .querySelector('.subject-name').textContent;
+    const completed = loadCompletedSubjects();
+    if (completed.includes(subjectName)) {
+      btn.classList.add('selected');
+    }
+
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('selected');
+      toggleCompletion(subjectName);
+    });
+  });
+}
 
 function renderSubjects(year, query = '') {
   requiredContainer.innerHTML = '';
   electiveContainer.innerHTML = '';
 
-  const yearSubjects = subjects.filter((sub) => sub.year === year);
-  const matched = query
-    ? yearSubjects.filter((s) => s.name.includes(query))
-    : [];
-  const unmatched = query
-    ? yearSubjects.filter((s) => !s.name.includes(query))
-    : yearSubjects;
-  const ordered = [...matched, ...unmatched];
+  const savedElectives = JSON.parse(
+    localStorage.getItem('savedElectives') || '[]'
+  );
+  const completedSubjects = JSON.parse(
+    localStorage.getItem('completedSubjects') || '[]'
+  );
 
-  ordered.forEach((sub) => {
+  const filtered = subjects.filter((sub) => sub.year === year);
+
+  filtered.forEach((sub) => {
     const card = document.createElement('div');
     card.className = 'subject-card';
     card.classList.add(
       sub.type === 'required' ? 'required-card' : 'elective-card'
     );
 
-    if (query && sub.name.includes(query)) {
-      card.classList.add('match');
-    }
+    const isCompleted = completedSubjects.includes(sub.name);
+    const cleanSubName = sub.name
+      .replace(/<br>/g, ' ')
+      .replace(/\n/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const isSaved = savedElectives.includes(cleanSubName);
 
     card.innerHTML = `
       <div class="subject-header">
-        <i class="fas fa-chevron-right"></i>
+        <button class="goto-home-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#fff" viewBox="0 0 24 24" class="goto-arrow">
+            <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+          </svg>
+        </button>
       </div>
       <div class="subject-info">
-        <div class="subject-name">${sub.name}</div>
+        <div class="subject-name">${sub.name.replace('\n', '<br>')}</div>
         <div class="subject-semester">${sub.semester}</div>
         <div class="subject-buttons">
           ${
             sub.type === 'required'
-              ? `<button class="complete-button"><i class="fas fa-check"></i> 수강완료</button>`
-              : `
-                <button class="add-button"><i class="fas fa-plus"></i> 담기</button>
-                <button class="complete-button"><i class="fas fa-check"></i> 수강</button>
-              `
+              ? `<button class="complete-btn ${
+                  isCompleted ? 'selected' : ''
+                }">✔ 수강완료</button>`
+              : `<button class="complete-btn ${
+                  isCompleted ? 'selected' : ''
+                }">✔ 수강</button><button class="add-btn ${
+                  isSaved ? 'selected' : ''
+                }">＋ 담기</button>`
           }
         </div>
       </div>
@@ -184,19 +272,49 @@ function renderSubjects(year, query = '') {
     } else {
       electiveContainer.appendChild(card);
     }
-  });
 
-  setupButtonToggle();
-  renderSubjectTextInfo(year);
-}
-
-function setupButtonToggle() {
-  const buttons = document.querySelectorAll('.subject-buttons button');
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      btn.classList.toggle('selected');
+    const completeBtn = card.querySelector('.complete-btn');
+    completeBtn.addEventListener('click', () => {
+      toggleCompletion(sub.name);
+      renderSubjects(currentYear);
+      completeBtn.classList.toggle('selected');
     });
+
+    const gotoBtn = card.querySelector('.goto-home-button');
+    gotoBtn.addEventListener('click', () => {
+      const highlightName = sub.name.trim().replace(/\s+/g, '');
+
+      // detail 영역(subject-detail-list)에서 일치하는 과목 찾기
+      const subjectLines = document.querySelectorAll(
+        '#subject-detail-list .name'
+      );
+
+      subjectLines.forEach((el) => {
+        // 이름 공백 제거 후 비교
+        const targetName = el.textContent.trim().replace(/\s+/g, '');
+        if (targetName === highlightName) {
+          el.closest('.subject-line').style.border = '3px solid #3a66e6';
+          el.closest('.subject-line').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        } else {
+          el.closest('.subject-line').style.border = 'none'; // 다른 과목은 초기화
+        }
+      });
+    });
+
+    if (sub.type === 'elective') {
+      const addBtn = card.querySelector('.add-btn');
+      addBtn.addEventListener('click', () => {
+        toggleElective(sub.name);
+        renderSubjects(currentYear);
+        addBtn.classList.toggle('selected');
+      });
+    }
   });
+
+  renderSubjectTextInfo(year);
 }
 
 function renderSubjectTextInfo(year) {
@@ -215,16 +333,15 @@ function renderSubjectTextInfo(year) {
       </div>
       <button class="review-button">수강평 보기</button>
     `;
-    subjectDetailList.appendChild(div);
-  });
-
-  const reviewButtons = document.querySelectorAll(
-    '.subject-line .review-button'
-  );
-  reviewButtons.forEach((btn, idx) => {
-    btn.addEventListener('click', () => {
-      alert(`'${filtered[idx].name}' 과목의 수강평 페이지로 이동합니다.`);
+    const reviewBtn = div.querySelector('.review-button');
+    reviewBtn.addEventListener('click', () => {
+      // 예: review.html 이동
+      window.location.href = `/review/review.html?subject=${encodeURIComponent(
+        sub.name
+      )}`;
     });
+
+    subjectDetailList.appendChild(div);
   });
 }
 
@@ -248,9 +365,41 @@ navItems.forEach((item) => {
   });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  document
-    .querySelector(`.year-buttons button[value="1"]`)
-    .classList.add('selected');
+function highlightSubjectIfNeeded() {
+  const highlight = localStorage.getItem('highlightSubject');
+  const highlightYear = parseInt(localStorage.getItem('highlightYear'), 10);
+
+  if (highlight && highlightYear) {
+    const yearButton = document.querySelector(
+      `.year-buttons button[value="${highlightYear}"]`
+    );
+    if (yearButton) {
+      yearButton.click(); // 그 학년을 클릭 → 렌더링 실행
+    }
+
+    setTimeout(() => {
+      const subjectEls = document.querySelectorAll('.subject-line .name');
+      subjectEls.forEach((el) => {
+        const elName = el.textContent.trim().replace(/\s+/g, '');
+        const highlightName = highlight.replace(/\s+/g, '');
+        if (elName === highlightName) {
+          el.closest('.subject-line').style.border = '3px solid #3a66e6';
+          el.closest('.subject-line').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }
+      });
+      localStorage.removeItem('highlightSubject');
+      localStorage.removeItem('highlightYear');
+    }, 500);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
   renderSubjects(1);
+  document
+    .querySelector('.year-buttons button[value="1"]')
+    .classList.add('selected');
+  highlightSubjectIfNeeded(); // << 여기서 호출
 });
