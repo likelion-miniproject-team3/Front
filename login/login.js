@@ -19,19 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 에러 상태 설정 함수
-  function setError(input, label, errorElem, message) {
-    if (message) {
-      input.classList.add('error');
-      label.classList.add('error');
-      errorElem.textContent = message;
-      errorElem.classList.add('active');
-    } else {
-      input.classList.remove('error');
-      label.classList.remove('error');
-      errorElem.textContent = '';
-      errorElem.classList.remove('active');
-    }
-  }
 
   // 입력 중엔 에러 해제 + 활성화 상태 토글
   function handleInput(input, label, errorElem) {

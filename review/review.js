@@ -1030,36 +1030,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const full = Math.round(score); // 반올림해서 정수로
     const empty = 5 - full;
 
-    return '★'.repeat(full) + '☆'.repeat(empty);
-  }
-
-  document.addEventListener('click', function (e) {
-    if (e.target.closest('.show-alert')) {
-      setTimeout(() => {
-        showCustomAlert('자료가 저장되었습니다.');
-      }, 500); // 다운로드 먼저 되게 약간 딜레이
-    }
-  });
-
-  // Object.keys(localStorage).forEach((key) => {
-  //   if (
-  //     key.startsWith('lecture-') ||
-  //     key.startsWith('exam-') ||
-  //     key === 'lectureReviews'
-  //   ) {
-  //     localStorage.removeItem(key);
-  //   }
-  // }); // 작성된 글 초기화
-
-  if (selectedReviewInfo && selectedReviewInfo.mode === 'lectureWrite') {
-    const subjectName = selectedReviewInfo.subject;
-    document.getElementById('subject-title').textContent = subjectName;
-
-    renderRating();
-    loadLectureReviews(subjectName);
-    loadExamReviews(subjectName);
-
-    subjectButtons.style.display = 'none';
     searchBar.style.display = 'none';
     gradeButtonGroup.style.display = 'none';
     textHeading.style.display = 'none';

@@ -38,25 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function clearError(input, errorDiv) {
-    errorDiv.textContent = '';
-    errorDiv.classList.remove('active');
-    input.previousElementSibling.style.color = '#3b6ef7'; // 라벨 파랑
-    input.style.borderBottomColor = '#3b6ef7'; // 밑줄 파랑
-  }
-
-  function clearAllError(input, errorDiv) {
-    errorDiv.textContent = '';
-    errorDiv.classList.remove('active');
-    input.previousElementSibling.style.color = '#aaa';
-
-    if (input.tagName === 'SELECT') {
-      input.classList.remove('error'); // 테두리 원래대로
-    } else {
-      input.style.borderBottomColor = '#ccc';
-    }
-  }
-
   function validateStep1() {
     let valid = true;
 
