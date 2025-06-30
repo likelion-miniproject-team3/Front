@@ -137,4 +137,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   console.log('최신 수정 반영 테스트');
+  localStorage.setItem('userId', data.userId); // ← 서버 응답에 userId가 포함되어야 함
 });
