@@ -121,7 +121,7 @@ button {
 
 .fixed-button {
   position: fixed; /* 화면에 고정 */
-  bottom: 50px;
+  bottom: 5vh;
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
