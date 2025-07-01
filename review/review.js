@@ -19,11 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const uploadOptions = document.getElementById('upload-options');
   const uploadArea = document.getElementById('upload-area');
   const fileInput = document.getElementById('fileInput');
-
   let filePath = '';
-  let isEditMode = false;
-  let currentEvaluationId = null;
-
   const baseUrl = 'http://34.199.232.12:8080';
 
   const savedUserInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -220,28 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = document.createElement('div');
       card.className = 'review-card';
       const stars = getStarHTML(review.stars);
-
-      // 내 userId 가져오기
-      const myUserId = parseInt(localStorage.getItem('userId'));
-
-      // 받아온 후기 목록 중 내 글 찾기
-      const myReview = evaluations.find((review) => review.userId === myUserId);
-
-      if (myReview) {
-        // 내가 쓴 글이 있으면 → 작성폼에 내용 채우고 수정 모드로 전환
-        textarea.value = myReview.content;
-        updateStars(myReview.rating);
-        selectedText.textContent = `${myReview.semesterYear} ${myReview.semesterTerm}`;
-        isEditMode = true;
-        currentEvaluationId = myReview.evaluationId;
-      } else {
-        // 작성한 글이 없으면 → 초기화
-        textarea.value = '';
-        updateStars(0);
-        selectedText.textContent = '수강 학기';
-        isEditMode = false;
-        currentEvaluationId = null;
-      }
 
       card.innerHTML = `
       <div class="review-header">
