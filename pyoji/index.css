@@ -21,7 +21,7 @@ body {
 }
 
 .bottom-area {
-  position: relative;
+  position: fixed;
   margin-top: 20px;
   bottom: 10vh;
   display: flex;
