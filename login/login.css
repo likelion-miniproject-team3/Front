@@ -113,7 +113,7 @@ input::placeholder {
 
 .bottom-area {
   position: absolute;
-  bottom: 75px;
+  bottom: 5vh;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -123,7 +123,6 @@ input::placeholder {
 }
 
 button {
-  bottom: 5vh;
   width: 87%;
   padding: 12px 0;
   font-size: 16px;
@@ -141,7 +140,6 @@ p {
   font-size: 14px;
   margin-top: 2px; /* 버튼과 간격 최소화 */
   font-size: 0.8rem; /* 10px */
-  bottom: 5vh;
 }
 
 p a {
