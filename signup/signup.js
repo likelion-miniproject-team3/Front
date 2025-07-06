@@ -528,10 +528,12 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ tempId, username }), // ✅ 서버 요구 형식
       });
 
+      // 응답 먼저 text로 받고, ok 여부는 그 뒤에 체크
       const text = await res.text();
-      console.log('서버 응답 원문:', text);
 
-      if (!res.ok) throw new Error('2단계 등록 실패: ' + text);
+      if (!res.ok) {
+        throw new Error('2단계 등록 실패: ' + text);
+      }
 
       // 응답 본문이 있는 경우에만 JSON 파싱 시도
       if (text?.trim()) {
