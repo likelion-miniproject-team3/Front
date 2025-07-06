@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 응답 먼저 text로 받고, ok 여부는 그 뒤에 체크
       const text = await res.text();
-      const tempId = Number(text);
+      const tempId = text.trim();
 
       if (!res.ok) {
         throw new Error('2단계 등록 실패: ' + text);
@@ -575,7 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const prevInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
             const updatedInfo = {
               ...prevInfo,
-              tempId: Number(data.tempId),
+              tempId: data.tempId,
             };
             localStorage.setItem('userInfo', JSON.stringify(updatedInfo));
           }
@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const prevInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
             const updatedInfo = {
               ...prevInfo,
-              tempId: Number(data.tempId),
+              tempId: data.tempId,
             };
             localStorage.setItem('userInfo', JSON.stringify(updatedInfo));
           }
