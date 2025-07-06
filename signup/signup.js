@@ -530,16 +530,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // JSON 파싱
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        console.error('JSON 파싱 실패:', e);
-        alert('서버 응답이 JSON이 아닙니다.');
-        return;
-      }
+      // let data;
+      // try {
+      //   data = JSON.parse(text);
+      // } catch (e) {
+      //   console.error('JSON 파싱 실패:', e);
+      //   alert('서버 응답이 JSON이 아닙니다.');
+      //   return;
+      // }
 
-      const tempId = data.tempId;
+      // const tempId = data.tempId;
+
+      const tempId = text.replace(/"/g, '');
+
       const userData = {
         username,
         nickname: usernickname,
