@@ -211,6 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const userid = document.getElementById('userid').value.trim();
     const password = document.getElementById('password').value.trim();
 
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const tempId = userInfo?.tempId;
+
     const userData = {
       username,
       usernickname,
@@ -219,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
       userid,
       password,
       field,
-      tempId: data.tempId,
+      tempId:,
     };
 
     // 로컬스토리지에 저장
