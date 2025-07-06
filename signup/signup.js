@@ -207,9 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('password').value.trim();
 
     const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-    const tempId = Number(userInfo.tempId);
-
-    if (!tempId || isNaN(tempId)) {
+    const tempId = userInfo?.tempId?.trim();
+    if (!tempId) {
       alert('tempId가 유효하지 않습니다. 다시 회원가입을 시작해주세요.');
       return false;
     }
@@ -309,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const tempId = Number(userInfo?.tempId);
+      const tempId = userInfo?.tempId;
 
       const majorMap = {
         '대학원 진학형': 1,
@@ -544,7 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!validateStep2()) return;
 
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const tempId = Number(userInfo?.tempId);
+    const tempId = userInfo?.tempId;
 
     console.log('userInfo:', userInfo);
     console.log('tempId:', tempId, typeof tempId);
@@ -630,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const tempId = Number(userInfo?.tempId);
+      const tempId = userInfo?.tempId;
 
       const res = await fetch(`${baseUrl}/api/auth/register/step3`, {
         method: 'POST',
