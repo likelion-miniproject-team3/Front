@@ -582,12 +582,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch(`${baseUrl}/api/auth/register/step2`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tempId, username }), // ✅ 서버 요구 형식
+        body: JSON.stringify({ tempId, username: yourInputValueHere }), // ✅ 서버 요구 형식
       });
 
-      if (!res.ok) {
-        const error = await res.text();
-        throw new Error('2단계 등록 실패: ' + error);
+      const text = await res.text(); // 응답이 비어있을 수도 있으니 text로 먼저 읽기
+      console.log('서버 응답 원문:', text);
+
+      if (!res.ok) throw new Error('2단계 등록 실패: ' + text);
+
+      if (text) {
+        const data = JSON.parse(text); // 내용이 있을 때만 파싱
+        console.log('파싱된 응답:', data);
       }
 
       showStep(2);
