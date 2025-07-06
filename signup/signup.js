@@ -477,16 +477,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }),
       });
 
-      const text = await res.text(); // 먼저 읽음
-      console.log('서버 응답:', text);
-
-      // 여기서 에러 처리 먼저
+      // ✅ 에러 발생 여부 먼저 확인
       if (!res.ok) {
-        alert('1단계 등록 실패: ' + text);
+        const errorText = await res.text(); // ❗️text()는 여기서만 쓰고
+        alert('1단계 등록 실패: ' + errorText);
         return;
       }
 
-      const tempId = await res.json(); // ✅ 숫자형 그대로 받음
+      // ✅ 그 외엔 json만!
+      const tempId = await res.json();
 
       const userData = {
         username,
@@ -496,8 +495,6 @@ document.addEventListener('DOMContentLoaded', () => {
         tempId,
       };
       localStorage.setItem('userInfo', JSON.stringify(userData));
-
-      // 다음 단계로 이동
       showStep(1);
     } catch (err) {
       alert('요청 중 에러 발생: ' + err.message);
