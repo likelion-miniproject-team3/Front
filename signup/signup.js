@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  submitBtn.addEventListener('click', async () => {
+  submitBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     if (!validateStep4()) return;
 
@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  nextBtn1.addEventListener('click', async () => {
+  nextBtn1.addEventListener('click', async (e) => {
     e.preventDefault();
     if (!validateStep1()) return;
 
@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  nextBtn2.addEventListener('click', async () => {
+  nextBtn2.addEventListener('click', async (e) => {
     e.preventDefault();
     const username = useridInput.value.trim(); // userId → username
 
@@ -573,7 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  nextBtn3.addEventListener('click', async () => {
+  nextBtn3.addEventListener('click', async (e) => {
     e.preventDefault();
     const password = passwordInput.value.trim();
     const passwordCheck = passwordCheckInput.value.trim();
