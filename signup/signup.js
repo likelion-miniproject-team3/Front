@@ -500,6 +500,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const text = await res.text(); // 서버 응답: tempId (문자열)
       console.log('📦 서버 응답 원문:', text);
 
+      const tempId = text.trim();
+
       if (isNaN(tempId) || tempId === 0) {
         throw new Error('tempId가 유효하지 않음: ' + text);
       }
