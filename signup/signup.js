@@ -39,6 +39,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function showStep(stepIndex) {
+    const steps = document.querySelectorAll('.step');
+    steps.forEach((step, index) => {
+      if (index === stepIndex) {
+        step.classList.add('active');
+      } else {
+        step.classList.remove('active');
+      }
+    });
+
+    const progressWidths = ['25%', '50%', '75%', '100%'];
+    const fillBar = document.querySelector('.fill');
+    fillBar.style.width = progressWidths[stepIndex];
+  }
+
   function clearError(input, errorDiv) {
     errorDiv.textContent = '';
     errorDiv.classList.remove('active');
@@ -273,9 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // 단계별 버튼 이벤트 및 진행바 width 조정
   next1.addEventListener('click', () => {
     if (validateStep1()) {
-      step1.classList.remove('active');
-      step2.classList.add('active');
-      fillBar.style.width = '50%'; // 1단계 → 2단계
+      // step1.classList.remove('active');
+      // step2.classList.add('active');
+      // fillBar.style.width = '50%'; // 1단계 → 2단계
+      showStep(1);
     }
   });
 
