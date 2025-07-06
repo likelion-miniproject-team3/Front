@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
       userid,
       password,
       field,
-      tempId:,
+      tempId,
     };
 
     // 로컬스토리지에 저장
@@ -250,9 +250,9 @@ document.addEventListener('DOMContentLoaded', () => {
           errorDiv.classList.remove('active');
         }
       } else {
-        label.style.color = '#aaa'; // 기본 라벨색
-        el.style.color = '#aaa'; // placeholder 색
-        el.style.borderBottomColor = '#ccc'; // 기본 밑줄색
+        label.style.color = '#aaa';
+        el.style.color = 'black'; // ✅ 입력 텍스트는 항상 검정
+        el.style.borderBottomColor = '#ccc';
         if (errorDiv) {
           errorDiv.textContent = '';
           errorDiv.classList.remove('active');
@@ -292,52 +292,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // 단계별 버튼 이벤트 및 진행바 width 조정
   next1.addEventListener('click', () => {
     if (validateStep1()) {
-      // step1.classList.remove('active');
-      // step2.classList.add('active');
-      // fillBar.style.width = '50%'; // 1단계 → 2단계
       showStep(1);
     }
   });
 
-  // next2.addEventListener('click', async () => {
-  //   if (validateStep2()) {
-  //     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-  //     const tempId = userInfo?.tempId;
-  //     const username = document.getElementById('userid').value.trim();
-
-  //     // 🔍 콘솔로 확인
-  //     console.log('2단계 요청값:', tempId, username);
-
-  //     try {
-  //       const res = await fetch(`${baseUrl}/api/auth/register/step2`, {
-  //         method: 'POST',
-  //         headers: { 'Content-Type': 'application/json' },
-  //         body: JSON.stringify({
-  //           tempId,
-  //           username,
-  //         }),
-  //       });
-
-  //       const data = await res.json();
-
-  //       if (!res.ok || data.success === false) {
-  //         alert('2단계 등록 실패:\n' + JSON.stringify(data));
-  //         return;
-  //       }
-
-  //       // 성공했으면 다음 단계로 넘어가
-  //       showStep(2); // 2 → 3단계로 전환
-  //     } catch (err) {
-  //       alert('2단계 등록 실패: ' + err.message);
-  //     }
-  //   }
-  // });
-
   next3.addEventListener('click', () => {
     if (validateStep3()) {
-      // step3.classList.remove('active');
-      // step4.classList.add('active');
-      // fillBar.style.width = '100%'; // 3단계 → 4단계
       showStep(3);
     }
   });
@@ -498,6 +458,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   nextBtn1.addEventListener('click', async () => {
+    if (!validateStep1()) return;
+
     const username = step1Inputs[0].value.trim();
     const usernickname = step1Inputs[1].value.trim();
     const useremail = step1Inputs[2].value.trim();
