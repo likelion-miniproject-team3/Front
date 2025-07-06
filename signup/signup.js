@@ -480,49 +480,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  nextBtn1.addEventListener('click', async (e) => {
-    e.preventDefault();
-    if (!validateStep1()) return;
+  nextBtn1.addEventListener('click', async () => {
+    const username = usernameInput.value.trim();
+    const nickname = usernicknameInput.value.trim();
+    const email = useremailInput.value.trim();
+    const studentNumber = usernumberInput.value.trim();
 
-    const username = step1Inputs[0].value.trim();
-    const usernickname = step1Inputs[1].value.trim();
-    const useremail = step1Inputs[2].value.trim();
-    const usernumber = step1Inputs[3].value.trim();
+    if (!validateStep1()) return;
 
     try {
       const res = await fetch(`${baseUrl}/api/auth/register/step1`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username,
-          nickname: usernickname,
-          email: useremail,
-          studentNumber: usernumber,
-        }),
+        body: JSON.stringify({ username, nickname, email, studentNumber }),
       });
 
-      // ✅ 에러 확인
-      if (!res.ok) {
-        const errorText = await res.text();
-        alert('1단계 등록 실패: ' + errorText);
-        return;
-      }
-      const tempIdText = await res.text(); // 문자열 형태로 먼저 받아오고
-      const tempId = Number(tempIdText);
+      const text = await res.text(); // 서버 응답: tempId (문자열)
+      console.log('📦 서버 응답 원문:', text);
 
-      // 저장
-      const userData = {
+      const tempId = Number(text); // 숫자로 변환
+
+      if (isNaN(tempId)) throw new Error('tempId가 숫자가 아님: ' + text);
+
+      const userInfo = {
         username,
-        nickname: usernickname,
-        email: useremail,
-        studentNumber: usernumber,
-        tempId,
+        nickname,
+        email,
+        studentNumber,
+        tempId, // ✅ 이게 핵심
       };
-      localStorage.setItem('userInfo', JSON.stringify(userData));
-      showStep(1);
+
+      localStorage.setItem('userInfo', JSON.stringify(userInfo));
+      console.log('✅ 1단계 저장 완료:', userInfo);
+
+      showStep(1); // → 2단계 화면으로 전환
     } catch (err) {
-      alert('요청 중 에러 발생: ' + err.message);
-      console.log('에러');
+      alert(err.message);
     }
   });
 
