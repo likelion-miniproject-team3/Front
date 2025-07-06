@@ -219,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
       userid,
       password,
       field,
+      tempId: data.tempId,
     };
 
     // 로컬스토리지에 저장
@@ -297,17 +298,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   next2.addEventListener('click', () => {
     if (validateStep2()) {
-      step2.classList.remove('active');
-      step3.classList.add('active');
-      fillBar.style.width = '75%'; // 2단계 → 3단계
+      // step2.classList.remove('active');
+      // step3.classList.add('active');
+      // fillBar.style.width = '75%'; // 2단계 → 3단계
+      showStep(2);
     }
   });
 
   next3.addEventListener('click', () => {
     if (validateStep3()) {
-      step3.classList.remove('active');
-      step4.classList.add('active');
-      fillBar.style.width = '100%'; // 3단계 → 4단계
+      // step3.classList.remove('active');
+      // step4.classList.add('active');
+      // fillBar.style.width = '100%'; // 3단계 → 4단계
+      showStep(3);
     }
   });
 
@@ -490,18 +493,24 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   nextBtn2.addEventListener('click', async () => {
-    const userId = useridInput.value.trim();
+    const username = useridInput.value.trim(); // userId → username
 
     if (!validateStep2()) return;
+
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const tempId = userInfo?.tempId;
 
     try {
       const res = await fetch(`${baseUrl}/api/auth/register/step2`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ tempId, username }), // ✅ 서버 요구 형식
       });
 
-      if (!res.ok) throw new Error('2단계 등록 실패');
+      if (!res.ok) {
+        const error = await res.text();
+        throw new Error('2단계 등록 실패: ' + error);
+      }
 
       showStep(2);
     } catch (err) {
