@@ -569,9 +569,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
           // ✅ tempId가 응답에 있다면 localStorage에 저장
           if (data.tempId) {
-            const prevInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
             const updatedInfo = {
-              ...prevInfo,
+              ...userInfo,
               tempId: data.tempId,
             };
             localStorage.setItem('userInfo', JSON.stringify(updatedInfo));
@@ -582,20 +581,6 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
       }
-
-      // 응답 본문이 있는 경우에만 JSON 파싱 시도
-      // if (text?.trim()) {
-      //   try {
-      //     const data = JSON.parse(text);
-      //     console.log('파싱된 응답:', data);
-      //   } catch (e) {
-      //     console.error('JSON 파싱 실패:', e);
-      //     alert('2단계 응답이 JSON 형식이 아닙니다.');
-      //     return;
-      //   }
-      // } else {
-      //   console.log('빈 응답: JSON 파싱 생략');
-      // }
 
       showStep(2); // 성공 시 3단계로 이동
     } catch (err) {
