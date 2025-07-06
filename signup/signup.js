@@ -322,10 +322,25 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('선택된 분야:', field); // ✅ 추가
 
     try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const tempId = userInfo?.tempId;
+
+      const majorMap = {
+        '대학원 진학형': 1,
+        '빅데이터 분야': 2,
+        'AI/클라우드 분야': 3,
+        '마이크로 전공형': 4,
+      };
+
+      const majorId = majorMap[field];
+
       const res = await fetch(`${baseUrl}/api/auth/register/step4`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ field }),
+        body: JSON.stringify({
+          tempId,
+          majorId,
+        }),
       });
 
       if (!res.ok) {
@@ -540,10 +555,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!validateStep3()) return;
 
     try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const tempId = userInfo?.tempId;
+
       const res = await fetch(`${baseUrl}/api/auth/register/step3`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({
+          tempId,
+          password,
+          confirmPassword: passwordCheck,
+        }),
       });
 
       if (!res.ok) throw new Error('3단계 등록 실패');
