@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const tempId = userInfo?.tempId;
+      const tempId = Number(userInfo?.tempId);
 
       const majorMap = {
         '대학원 진학형': 1,
@@ -519,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!validateStep2()) return;
 
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const tempId = userInfo?.tempId;
+    const tempId = Number(userInfo?.tempId);
 
     try {
       const res = await fetch(`${baseUrl}/api/auth/register/step2`, {
@@ -578,7 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const tempId = userInfo?.tempId;
+      const tempId = Number(userInfo?.tempId);
 
       const res = await fetch(`${baseUrl}/api/auth/register/step3`, {
         method: 'POST',
