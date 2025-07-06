@@ -520,12 +520,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }),
       });
 
+      const text = await res.text();
+      console.log('서버 응답:', text);
+
       if (!res.ok) throw new Error('1단계 등록 실패');
 
       const data = await res.json(); // ✅ 이거 있어야 함!
       const tempId = data.tempId;
 
-      // 👉 tempId 저장!
+      // tempId 저장
       const userData = {
         username,
         nickname: usernickname,
