@@ -481,6 +481,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   nextBtn1.addEventListener('click', async () => {
+    const usernameInput = document.getElementById('username');
+    const usernicknameInput = document.getElementById('usernickname'); // ✅ 이 줄도 추가
+    const useremailInput = document.getElementById('useremail');
+    const usernumberInput = document.getElementById('usernumber');
+
     const username = usernameInput.value.trim();
     const nickname = usernicknameInput.value.trim();
     const email = useremailInput.value.trim();
@@ -500,7 +505,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const tempId = Number(text); // 숫자로 변환
 
-      if (isNaN(tempId)) throw new Error('tempId가 숫자가 아님: ' + text);
+      if (isNaN(tempId) || tempId === 0) {
+        throw new Error('tempId가 유효하지 않음: ' + text);
+      }
 
       const userInfo = {
         username,
