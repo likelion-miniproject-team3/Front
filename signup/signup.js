@@ -522,6 +522,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!res.ok) throw new Error('1단계 등록 실패');
 
+      const data = await res.json(); // ✅ 이거 있어야 함!
+      const tempId = data.tempId;
+
+      // 👉 tempId 저장!
+      const userData = {
+        username,
+        nickname: usernickname,
+        email: useremail,
+        studentNumber: usernumber,
+        tempId, // 꼭 저장!
+      };
+      localStorage.setItem('userInfo', JSON.stringify(userData));
+
       // 성공한 경우에만 넘어가기
       showStep(1);
     } catch (err) {
