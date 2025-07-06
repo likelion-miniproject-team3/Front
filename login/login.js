@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const useridError = document.getElementById('userid-error');
   const passwordError = document.getElementById('password-error');
   // const toggleBtn = document.getElementById('togglePassword');
-  const baseUrl = 'http://34.199.232.12:8080';
+  const baseUrl = 'https://majorapp.live';
 
   // 기존 활성화 함수 유지 (포커스/입력 색 변경)
   function toggleActive(input, label) {

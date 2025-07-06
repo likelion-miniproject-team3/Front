@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const fieldArrow = document.getElementById('field-dropdown-arrow');
 
   const fillBar = document.querySelector('.fill');
-  const baseUrl = 'http://34.199.232.12:8080';
+  const baseUrl = 'https://majorapp.live';
 
   function setError(input, errorDiv, message) {
     errorDiv.textContent = message;

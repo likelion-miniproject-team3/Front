@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const uploadArea = document.getElementById('upload-area');
   const fileInput = document.getElementById('fileInput');
   let filePath = '';
-  const baseUrl = 'http://34.199.232.12:8080';
+  const baseUrl = 'https://majorapp.live';
 
   const savedUserInfo = JSON.parse(localStorage.getItem('userInfo'));
   const nickname = savedUserInfo?.usernickname || '익명';
