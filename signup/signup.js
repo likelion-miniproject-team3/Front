@@ -546,6 +546,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const tempId = Number(userInfo?.tempId);
 
+    console.log('userInfo:', userInfo);
+    console.log('tempId:', tempId, typeof tempId);
+    console.log('username:', username);
+
     try {
       const res = await fetch(`${baseUrl}/api/auth/register/step2`, {
         method: 'POST',
@@ -582,18 +586,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // 응답 본문이 있는 경우에만 JSON 파싱 시도
-      if (text?.trim()) {
-        try {
-          const data = JSON.parse(text);
-          console.log('파싱된 응답:', data);
-        } catch (e) {
-          console.error('JSON 파싱 실패:', e);
-          alert('2단계 응답이 JSON 형식이 아닙니다.');
-          return;
-        }
-      } else {
-        console.log('빈 응답: JSON 파싱 생략');
-      }
+      // if (text?.trim()) {
+      //   try {
+      //     const data = JSON.parse(text);
+      //     console.log('파싱된 응답:', data);
+      //   } catch (e) {
+      //     console.error('JSON 파싱 실패:', e);
+      //     alert('2단계 응답이 JSON 형식이 아닙니다.');
+      //     return;
+      //   }
+      // } else {
+      //   console.log('빈 응답: JSON 파싱 생략');
+      // }
 
       showStep(2); // 성공 시 3단계로 이동
     } catch (err) {
@@ -636,6 +640,8 @@ document.addEventListener('DOMContentLoaded', () => {
           confirmPassword: passwordCheck,
         }),
       });
+
+      const text = await res.text();
 
       if (!res.ok) throw new Error('3단계 등록 실패');
 
