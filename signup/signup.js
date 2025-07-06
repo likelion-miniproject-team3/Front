@@ -9,11 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const next3 = document.getElementById('next3');
   const submitBtn = document.getElementById('submit');
 
-  const usernameError = document.getElementById('username-error');
   const usernicknameError = document.getElementById('usernickname-error');
   const useremailError = document.getElementById('useremail-error');
   const usernumberError = document.getElementById('usernumber-error');
-  const useridError = document.getElementById('userid-error');
+  const usernameError = document.getElementById('username-error');
   const passwordError = document.getElementById('password-error');
   const fieldError = document.getElementById('field-error');
   const passwordCheckError = document.getElementById('password-check-error');
@@ -129,13 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function validateStep2() {
-    const useridInput = document.getElementById('userid');
-    const userid = useridInput.value.trim();
+    const usernameInput = document.getElementById('username');
+    const username = usernameInput.value.trim();
 
-    clearAllError(useridInput, useridError);
+    clearAllError(usernameInput, usernameError);
 
-    if (userid === '') {
-      setError(useridInput, useridError, '아이디를 다시 확인해주세요');
+    if (username === '') {
+      setError(usernameInput, usernameError, '아이디를 다시 확인해주세요');
       return false;
     }
     return true;
@@ -190,8 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectBox = document.querySelector('.custom-select');
 
     // 에러 초기화
-    // clearAllError(fieldInput, fieldError);
-
     errorDiv.textContent = '';
     errorDiv.classList.remove('active');
     selectBox.classList.remove('error');
@@ -203,31 +200,31 @@ document.addEventListener('DOMContentLoaded', () => {
       return false;
     }
 
-    // 이전 단계에서 입력한 모든 정보 수집
-    const username = document.getElementById('username').value.trim();
     const usernickname = document.getElementById('usernickname').value.trim();
     const useremail = document.getElementById('useremail').value.trim();
     const usernumber = document.getElementById('usernumber').value.trim();
-    const userid = document.getElementById('userid').value.trim();
+    const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const tempId = Number(userInfo?.tempId);
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+    const tempId = Number(userInfo.tempId);
+
+    if (!tempId || isNaN(tempId)) {
+      alert('tempId가 유효하지 않습니다. 다시 회원가입을 시작해주세요.');
+      return false;
+    }
 
     const userData = {
       username,
       usernickname,
       useremail,
       usernumber,
-      userid,
       password,
       field,
       tempId,
     };
 
-    // 로컬스토리지에 저장
     localStorage.setItem('userInfo', JSON.stringify(userData));
-
     return true;
   }
 
@@ -504,12 +501,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const text = await res.text(); // 서버 응답: tempId (문자열)
       console.log('📦 서버 응답 원문:', text);
 
-      const tempId = Number(text); // 숫자로 변환
+      const tempId = text.trim();
 
       if (isNaN(tempId) || tempId === 0) {
         throw new Error('tempId가 유효하지 않음: ' + text);
       }
-
+      localStorage.setItem(
+        'userInfo',
+        JSON.stringify({ username, nickname, email, studentNumber, tempId })
+      );
       const userInfo = {
         username,
         nickname,
@@ -527,11 +527,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  const useridInput = document.getElementById('userid');
+  const usernameInput = document.getElementById('username');
   const nextBtn2 = document.getElementById('next2');
 
-  useridInput.addEventListener('input', () => {
-    if (useridInput.value.trim() !== '') {
+  usernameInput.addEventListener('input', () => {
+    if (usernameInput.value.trim() !== '') {
       nextBtn2.classList.add('active');
     } else {
       nextBtn2.classList.remove('active');
@@ -540,8 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   nextBtn2.addEventListener('click', async (e) => {
     e.preventDefault();
-    const username = useridInput.value.trim(); // userId → username
-
+    const username = usernameInput.value.trim();
     if (!validateStep2()) return;
 
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
