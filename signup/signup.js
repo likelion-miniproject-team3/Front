@@ -585,18 +585,19 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ tempId, username }), // ✅ 서버 요구 형식
       });
 
-      const text = await res.text(); // 응답이 비어있을 수도 있으니 text로 먼저 읽기
+      const text = await res.text();
       console.log('서버 응답 원문:', text);
 
       if (!res.ok) throw new Error('2단계 등록 실패: ' + text);
 
+      let data = null;
       if (text?.trim()) {
         try {
-          const data = JSON.parse(text);
+          data = JSON.parse(text);
           console.log('파싱된 응답:', data);
         } catch (e) {
           console.error('JSON 파싱 실패:', e);
-          alert('응답이 JSON이 아님');
+          alert('2단계 응답이 JSON 형식이 아닙니다.');
           return;
         }
       }
