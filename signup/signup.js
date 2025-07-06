@@ -483,10 +483,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const useremailInput = document.getElementById('useremail');
     const usernumberInput = document.getElementById('usernumber');
 
-    const username = usernameInput.value.trim();
+    const name = usernameInput.value.trim();
     const nickname = usernicknameInput.value.trim();
     const email = useremailInput.value.trim();
-    const studentNumber = usernumberInput.value.trim();
+    const studentId = usernumberInput.value.trim();
 
     if (!validateStep1()) return;
 
@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch(`${baseUrl}/api/auth/register/step1`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, nickname, email, studentNumber }),
+        body: JSON.stringify({ name, nickname, email, studentId }),
       });
 
       const text = await res.text(); // 서버 응답: tempId (문자열)
@@ -507,13 +507,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       localStorage.setItem(
         'userInfo',
-        JSON.stringify({ username, nickname, email, studentNumber, tempId })
+        JSON.stringify({ name, nickname, email, studentId, tempId })
       );
       const userInfo = {
-        username,
+        name,
         nickname,
         email,
-        studentNumber,
+        studentId,
         tempId, // ✅ 이게 핵심
       };
 
@@ -539,7 +539,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   nextBtn2.addEventListener('click', async (e) => {
     e.preventDefault();
-    const username = usernameInput.value.trim();
+    const userIdInput = document.getElementById('userid');
+    const username = userIdInput.value.trim();
     if (!validateStep2()) return;
 
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
