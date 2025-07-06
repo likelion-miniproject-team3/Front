@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const prevInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
             const updatedInfo = {
               ...prevInfo,
-              tempId: Number(data.tempId),
+              tempId: data.tempId,
             };
             localStorage.setItem('userInfo', JSON.stringify(updatedInfo));
           }
