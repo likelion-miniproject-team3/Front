@@ -336,6 +336,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const errorText = await res.text(); // ❗️서버 에러 메시지 확인
         throw new Error('4단계 등록 실패: ' + errorText);
       }
+
+      if (text?.trim()) {
+        try {
+          const data = JSON.parse(text);
+          console.log('파싱된 응답:', data);
+
+          // ✅ tempId가 응답에 있다면 localStorage에 저장
+          if (data.tempId) {
+            const prevInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+            const updatedInfo = {
+              ...prevInfo,
+              tempId: Number(data.tempId),
+            };
+            localStorage.setItem('userInfo', JSON.stringify(updatedInfo));
+          }
+        } catch (e) {
+          console.error('JSON 파싱 실패:', e);
+          alert('응답이 JSON 형식이 아닙니다.');
+          return;
+        }
+      }
+
       let redirectPage = '/home/home.html'; // 기본값
 
       switch (field) {
@@ -538,6 +560,27 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('2단계 등록 실패: ' + text);
       }
 
+      if (text?.trim()) {
+        try {
+          const data = JSON.parse(text);
+          console.log('파싱된 응답:', data);
+
+          // ✅ tempId가 응답에 있다면 localStorage에 저장
+          if (data.tempId) {
+            const prevInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+            const updatedInfo = {
+              ...prevInfo,
+              tempId: Number(data.tempId),
+            };
+            localStorage.setItem('userInfo', JSON.stringify(updatedInfo));
+          }
+        } catch (e) {
+          console.error('JSON 파싱 실패:', e);
+          alert('응답이 JSON 형식이 아닙니다.');
+          return;
+        }
+      }
+
       // 응답 본문이 있는 경우에만 JSON 파싱 시도
       if (text?.trim()) {
         try {
@@ -595,6 +638,27 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (!res.ok) throw new Error('3단계 등록 실패');
+
+      if (text?.trim()) {
+        try {
+          const data = JSON.parse(text);
+          console.log('파싱된 응답:', data);
+
+          // ✅ tempId가 응답에 있다면 localStorage에 저장
+          if (data.tempId) {
+            const prevInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+            const updatedInfo = {
+              ...prevInfo,
+              tempId: Number(data.tempId),
+            };
+            localStorage.setItem('userInfo', JSON.stringify(updatedInfo));
+          }
+        } catch (e) {
+          console.error('JSON 파싱 실패:', e);
+          alert('응답이 JSON 형식이 아닙니다.');
+          return;
+        }
+      }
 
       showStep(3);
     } catch (err) {
