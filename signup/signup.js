@@ -477,16 +477,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }),
       });
 
-      // ✅ 에러 발생 여부 먼저 확인
+      // ✅ 에러 확인
       if (!res.ok) {
-        const errorText = await res.text(); // ❗️text()는 여기서만 쓰고
+        const errorText = await res.text();
         alert('1단계 등록 실패: ' + errorText);
         return;
       }
 
-      // ✅ 그 외엔 json만!
-      const tempId = await res.json();
+      // ✅ 여기! 응답이 숫자면 그대로, 객체면 .tempId로 추출
+      const data = await res.json();
+      const tempId = typeof data === 'number' ? data : data.tempId;
 
+      // 저장
       const userData = {
         username,
         nickname: usernickname,
