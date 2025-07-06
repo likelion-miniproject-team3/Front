@@ -483,10 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('1단계 등록 실패: ' + errorText);
         return;
       }
-
-      // ✅ 여기! 응답이 숫자면 그대로, 객체면 .tempId로 추출
-      const data = await res.json();
-      const tempId = typeof data === 'number' ? data : data.tempId;
+      const tempId = await res.text();
 
       // 저장
       const userData = {
