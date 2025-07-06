@@ -303,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   submitBtn.addEventListener('click', async () => {
+    e.preventDefault();
     if (!validateStep4()) return;
 
     //  HEAD:FRONT-END/signup.js
@@ -458,6 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   nextBtn1.addEventListener('click', async () => {
+    e.preventDefault();
     if (!validateStep1()) return;
 
     const username = step1Inputs[0].value.trim();
@@ -514,6 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   nextBtn2.addEventListener('click', async () => {
+    e.preventDefault();
     const username = useridInput.value.trim(); // userId → username
 
     if (!validateStep2()) return;
@@ -571,6 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   nextBtn3.addEventListener('click', async () => {
+    e.preventDefault();
     const password = passwordInput.value.trim();
     const passwordCheck = passwordCheckInput.value.trim();
 
