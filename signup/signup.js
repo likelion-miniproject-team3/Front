@@ -590,19 +590,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!res.ok) throw new Error('2단계 등록 실패: ' + text);
 
-      let data = null;
+      // 응답 본문이 있는 경우에만 JSON 파싱 시도
       if (text?.trim()) {
         try {
-          data = JSON.parse(text);
+          const data = JSON.parse(text);
           console.log('파싱된 응답:', data);
         } catch (e) {
           console.error('JSON 파싱 실패:', e);
           alert('2단계 응답이 JSON 형식이 아닙니다.');
           return;
         }
+      } else {
+        console.log('빈 응답: JSON 파싱 생략');
       }
 
-      showStep(2);
+      showStep(2); // 성공 시 3단계로 이동
     } catch (err) {
       alert(err.message);
     }
