@@ -483,7 +483,8 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('1단계 등록 실패: ' + errorText);
         return;
       }
-      const tempId = await res.text();
+      const tempIdText = await res.text(); // 문자열 형태로 먼저 받아오고
+      const tempId = Number(tempIdText);
 
       // 저장
       const userData = {
