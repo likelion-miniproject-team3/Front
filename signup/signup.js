@@ -500,21 +500,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const text = await res.text(); // 서버 응답: tempId (문자열)
       console.log('📦 서버 응답 원문:', text);
 
-      const tempId = text.trim();
+      const data = JSON.parse(text); // ✅ JSON으로 파싱
+      const tempId = data.tempId; // ✅ 여기서 tempId 꺼냄
 
-      if (isNaN(tempId) || tempId === 0) {
-        throw new Error('tempId가 유효하지 않음: ' + text);
+      if (!tempId || isNaN(tempId)) {
+        throw new Error('tempId가 유효하지 않음: ' + tempId);
       }
-      localStorage.setItem(
-        'userInfo',
-        JSON.stringify({ name, nickname, email, studentId, tempId })
-      );
+
       const userInfo = {
         name,
         nickname,
         email,
         studentId,
-        tempId, // ✅ 이게 핵심
+        tempId,
       };
 
       localStorage.setItem('userInfo', JSON.stringify(userInfo));
