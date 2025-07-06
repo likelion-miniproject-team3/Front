@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('password').value.trim();
 
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const tempId = userInfo?.tempId;
+    const tempId = Number(userInfo?.tempId);
 
     const userData = {
       username,
@@ -336,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const errorText = await res.text(); // ❗️서버 에러 메시지 확인
         throw new Error('4단계 등록 실패: ' + errorText);
       }
+      const text = await res.text();
 
       if (text?.trim()) {
         try {
@@ -559,6 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 응답 먼저 text로 받고, ok 여부는 그 뒤에 체크
       const text = await res.text();
+      const tempId = Number(text);
 
       if (!res.ok) {
         throw new Error('2단계 등록 실패: ' + text);
