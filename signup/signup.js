@@ -500,8 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const text = await res.text(); // 서버 응답: tempId (문자열)
       console.log('📦 서버 응답 원문:', text);
 
-      const tempId = text.trim();
-
       if (isNaN(tempId) || tempId === 0) {
         throw new Error('tempId가 유효하지 않음: ' + text);
       }
@@ -559,7 +557,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 응답 먼저 text로 받고, ok 여부는 그 뒤에 체크
       const text = await res.text();
-      const tempId = text.trim();
 
       if (!res.ok) {
         throw new Error('2단계 등록 실패: ' + text);
