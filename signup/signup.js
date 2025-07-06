@@ -520,28 +520,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }),
       });
 
-      const text = await res.text();
+      const text = await res.text(); // 먼저 읽음
       console.log('서버 응답:', text);
 
-      if (!res.ok) throw new Error('1단계 등록 실패');
+      // 여기서 에러 처리 먼저
+      if (!res.ok) {
+        alert('1단계 등록 실패: ' + text);
+        return;
+      }
 
-      const data = await res.json(); // ✅ 이거 있어야 함!
+      // JSON 파싱
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('JSON 파싱 실패:', e);
+        alert('서버 응답이 JSON이 아닙니다.');
+        return;
+      }
+
       const tempId = data.tempId;
-
-      // tempId 저장
       const userData = {
         username,
         nickname: usernickname,
         email: useremail,
         studentNumber: usernumber,
-        tempId, // 꼭 저장!
+        tempId,
       };
       localStorage.setItem('userInfo', JSON.stringify(userData));
 
-      // 성공한 경우에만 넘어가기
+      // 다음 단계로 이동
       showStep(1);
     } catch (err) {
-      alert(err.message);
+      alert('요청 중 에러 발생: ' + err.message);
     }
   });
 
