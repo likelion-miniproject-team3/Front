@@ -296,12 +296,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  next2.addEventListener('click', () => {
+  // next2.addEventListener('click', () => {
+  //   if (validateStep2()) {
+  //     // step2.classList.remove('active');
+  //     // step3.classList.add('active');
+  //     // fillBar.style.width = '75%'; // 2단계 → 3단계
+  //     showStep(2);
+  //   }
+  // });
+  next2.addEventListener('click', async () => {
     if (validateStep2()) {
-      // step2.classList.remove('active');
-      // step3.classList.add('active');
-      // fillBar.style.width = '75%'; // 2단계 → 3단계
-      showStep(2);
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const tempId = userInfo?.tempId;
+      const username = document.getElementById('userid').value.trim();
+
+      // 🔍 콘솔로 확인
+      console.log('2단계 요청값:', tempId, username);
+
+      try {
+        const res = await fetch(`${baseUrl}/api/auth/register/step2`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tempId,
+            username,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || data.success === false) {
+          alert('2단계 등록 실패:\n' + JSON.stringify(data));
+          return;
+        }
+
+        // 성공했으면 다음 단계로 넘어가
+        showStep(2); // 2 → 3단계로 전환
+      } catch (err) {
+        alert('2단계 등록 실패: ' + err.message);
+      }
     }
   });
 
